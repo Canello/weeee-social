@@ -26,6 +26,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const currentUser = getCurrentUser();
 
   const [selectedIdea, setSelectedIdea] = useState<FeedItem | null>(null);
+  const [bioExpanded, setBioExpanded] = useState(false);
+  const [bioShouldCollapse, setBioShouldCollapse] = useState(false);
 
   const userIdeas = mockIdeas.filter(idea => idea.creatorId === currentUser.id);
   const userFeedItems: FeedItem[] = userIdeas.map(idea => ({
@@ -82,7 +84,28 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       <Text style={styles.displayName}>{currentUser.displayName}</Text>
       <Text style={styles.username}>@{currentUser.username}</Text>
       {currentUser.bio && (
-        <Text style={styles.bio}>{currentUser.bio}</Text>
+        <>
+          <Text
+            style={styles.bio}
+            numberOfLines={bioExpanded ? undefined : 4}
+            ellipsizeMode="tail"
+            onTextLayout={e => {
+              if (!bioShouldCollapse && e.nativeEvent.lines.length > 4) {
+                setBioShouldCollapse(true);
+              }
+            }}
+          >
+            {currentUser.bio}
+          </Text>
+          {bioShouldCollapse && (
+            <Text
+              style={styles.seeMore}
+              onPress={() => setBioExpanded(exp => !exp)}
+            >
+              {bioExpanded ? 'See less' : 'See more'}
+            </Text>
+          )}
+        </>
       )}
       <View style={styles.buttonsContainer}>
         <TouchableOpacity style={styles.socialIcon} activeOpacity={0.7}>
@@ -430,7 +453,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     paddingHorizontal: 24,
-    marginBottom: 24,
+    marginBottom: 16,
   },
   socialIcon: {
     width: 46,
@@ -454,8 +477,16 @@ const styles = StyleSheet.create({
     color: '#ddd',
     textAlign: 'left',
     lineHeight: 18,
-    marginBottom: 20,
     paddingHorizontal: 24,
+  },
+  seeMore: {
+    color: '#fff',
+    marginLeft: 24,
+    marginBottom: 20,
+    paddingTop: 8,
+    paddingBottom: 8,
+    fontWeight: '600',
+    fontSize: 14,
   },
   avatar: {
     width: 80,

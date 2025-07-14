@@ -29,6 +29,8 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ navigation
   const profileUser = mockUsers.find(user => user.id === userId);
 
   const [selectedIdea, setSelectedIdea] = useState<FeedItem | null>(null);
+  const [bioExpanded, setBioExpanded] = useState(false);
+  const [bioShouldCollapse, setBioShouldCollapse] = useState(false);
 
   // If user not found, show error or redirect
   if (!profileUser) {
@@ -110,13 +112,42 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ navigation
         <Text style={styles.displayName}>{profileUser.displayName}</Text>
         <Text style={styles.username}>@{profileUser.username}</Text>
         {profileUser.bio && (
-          <Text style={styles.bio}>{profileUser.bio}</Text>
+          <>
+            <Text
+              style={styles.bio}
+              numberOfLines={bioExpanded ? undefined : 4}
+              ellipsizeMode="tail"
+              onTextLayout={e => {
+                if (!bioShouldCollapse && e.nativeEvent.lines.length > 4) {
+                  setBioShouldCollapse(true);
+                }
+              }}
+            >
+              {profileUser.bio}
+            </Text>
+            {bioShouldCollapse && (
+              <Text
+                style={styles.seeMore}
+                onPress={() => setBioExpanded(exp => !exp)}
+              >
+                {bioExpanded ? 'See less' : 'See more'}
+              </Text>
+            )}
+          </>
         )}
         <View style={styles.buttonsContainer}>
           <TouchableOpacity
-            style={styles.followButton}
-            onPress={handleFollow}
+            style={[
+              styles.followButton,
+              currentUser.following.includes(profileUser.id) && styles.followButtonActive,
+            ]}
+            onPress={currentUser.following.includes(profileUser.id) ? undefined : handleFollow}
+            disabled={currentUser.following.includes(profileUser.id)}
+            activeOpacity={currentUser.following.includes(profileUser.id) ? 1 : 0.7}
           >
+            {currentUser.following.includes(profileUser.id) && (
+              <Ionicons name="checkmark" size={18} color="#fff" style={{ marginRight: 2 }} />
+            )}
             <Text style={styles.followButtonText}>
               {currentUser.following.includes(profileUser.id) ? 'Following' : 'Follow'}
             </Text>
@@ -397,7 +428,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     paddingHorizontal: 24,
-    marginBottom: 24,
+    marginBottom: 16,
   },
   socialIcon: {
     width: 46,
@@ -414,6 +445,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 7,
+  },
+  followButtonActive: {
+    backgroundColor: '#222',
+    opacity: 0.7,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   followButtonText: {
     color: '#fff',
@@ -454,8 +492,16 @@ const styles = StyleSheet.create({
     color: '#ddd',
     textAlign: 'left',
     lineHeight: 18,
-    marginBottom: 20,
     paddingHorizontal: 24,
+  },
+  seeMore: {
+    color: '#fff',
+    marginLeft: 24,
+    marginBottom: 20,
+    paddingTop: 8,
+    paddingBottom: 8,
+    fontWeight: '600',
+    fontSize: 14,
   },
   avatar: {
     width: 80,

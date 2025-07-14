@@ -72,10 +72,18 @@ export const FollowersListScreen: React.FC<FollowersListScreenProps> = ({ naviga
         </View>
         {!isCurrentUser && (
           <TouchableOpacity
-            style={[styles.followButton, isFollowing && styles.followingButton]}
-            onPress={() => handleFollow(item.id)}
+            style={[
+              styles.followButton,
+              isFollowing && styles.followButtonActive,
+            ]}
+            onPress={isFollowing ? undefined : () => handleFollow(item.id)}
+            disabled={isFollowing}
+            activeOpacity={isFollowing ? 1 : 0.7}
           >
-            <Text style={[styles.followButtonText, isFollowing && styles.followingButtonText]}>
+            {isFollowing && (
+              <Ionicons name="checkmark" size={16} color="#fff" style={{ marginRight: 4 }} />
+            )}
+            <Text style={styles.followButtonText}>
               {isFollowing ? 'Following' : 'Follow'}
             </Text>
           </TouchableOpacity>
@@ -90,7 +98,7 @@ export const FollowersListScreen: React.FC<FollowersListScreenProps> = ({ naviga
         style={styles.backButton}
         onPress={() => navigation.goBack()}
       >
-        <Ionicons name="arrow-back" size={24} color="#333" />
+        <Ionicons name="arrow-back" size={24} color="#fff" />
       </TouchableOpacity>
       <Text style={styles.headerTitle}>
         {type === 'followers' ? 'Followers' : 'Following'}
@@ -209,15 +217,18 @@ const styles = StyleSheet.create({
   },
 
   followButton: {
-    backgroundColor: '#667eea',
+    backgroundColor: 'rgba(37, 174, 248, 1)',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 20,
+    borderRadius: 7,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  followingButton: {
+  followButtonActive: {
     backgroundColor: '#181a20',
-    borderWidth: 1,
-    borderColor: '#667eea',
+    opacity: 0.7,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   followButtonText: {
     color: '#fff',
