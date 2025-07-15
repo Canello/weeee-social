@@ -45,33 +45,49 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
     navigation.navigate('UserProfile', { userId });
   };
 
-  const renderUserCard = ({ item, index }: { item: User, index: number }) => (
-    <TouchableOpacity
-      style={[styles.userCard, index === 0 && styles.firstUserCard]}
-      onPress={() => handleUserPress(item.id)}
-      activeOpacity={0.8}
-    >
-      <Image source={{ uri: item.avatar }} style={styles.userAvatar} />
-      <View style={styles.userInfo}>
-        <Text style={styles.userDisplayName}>{item.displayName}</Text>
-        <Text style={styles.userUsername}>@{item.username}</Text>
-        <View style={styles.userStats}>
-          <Text style={styles.userStat}>
-            {item.followers.length} followers
-          </Text>
-          <Text style={styles.userStat}>
-            {item.following.length} following
-          </Text>
-        </View>
-      </View>
+  const renderUserCard = ({ item, index }: { item: User, index: number }) => {
+    const isCurrentUser = item.id === currentUser.id;
+    const isFollowing = currentUser.following.includes(item.id);
+    return (
       <TouchableOpacity
-        style={styles.followButton}
-        onPress={() => handleFollow(item.id)}
+        style={[styles.userCard, index === 0 && styles.firstUserCard]}
+        onPress={() => handleUserPress(item.id)}
+        activeOpacity={0.8}
       >
-        <Text style={styles.followButtonText}>Follow</Text>
+        <Image source={{ uri: item.avatar }} style={styles.userAvatar} />
+        <View style={styles.userInfo}>
+          <Text style={styles.userDisplayName}>{item.displayName}</Text>
+          <Text style={styles.userUsername}>@{item.username}</Text>
+          <View style={styles.userStats}>
+            <Text style={styles.userStat}>
+              {item.followers.length} followers
+            </Text>
+            <Text style={styles.userStat}>
+              {item.following.length} following
+            </Text>
+          </View>
+        </View>
+        {!isCurrentUser && (
+          <TouchableOpacity
+            style={[
+              styles.followButton,
+              isFollowing && styles.followButtonActive,
+            ]}
+            onPress={isFollowing ? undefined : () => handleFollow(item.id)}
+            disabled={isFollowing}
+            activeOpacity={isFollowing ? 1 : 0.7}
+          >
+            {isFollowing && (
+              <Ionicons name="checkmark" size={16} color="#fff" style={{ marginRight: 4 }} />
+            )}
+            <Text style={styles.followButtonText}>
+              {isFollowing ? 'Following' : 'Follow'}
+            </Text>
+          </TouchableOpacity>
+        )}
       </TouchableOpacity>
-    </TouchableOpacity>
-  );
+    );
+  };
 
   const renderHeader = () => (
     <View style={styles.header}>
@@ -223,10 +239,18 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   followButton: {
-    backgroundColor: '#3a3b47',
+    backgroundColor: 'rgba(37, 174, 248, 1)',
+    paddingHorizontal: 16,
     paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 20,
+    borderRadius: 7,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  followButtonActive: {
+    backgroundColor: '#181a20',
+    opacity: 0.7,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   followButtonText: {
     color: '#fff',
