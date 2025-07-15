@@ -58,10 +58,18 @@ export const InterestedPeopleScreen: React.FC<InterestedPeopleScreenProps> = ({ 
         </View>
         {!isCurrentUser && (
           <TouchableOpacity
-            style={[styles.followButton, isFollowing && styles.followingButton]}
-            onPress={() => handleFollow(item.id)}
+            style={[
+              styles.followButton,
+              isFollowing && styles.followButtonActive,
+            ]}
+            onPress={isFollowing ? undefined : () => handleFollow(item.id)}
+            disabled={isFollowing}
+            activeOpacity={isFollowing ? 1 : 0.7}
           >
-            <Text style={[styles.followButtonText, isFollowing && styles.followingButtonText]}>
+            {isFollowing && (
+              <Ionicons name="checkmark" size={16} color="#fff" style={{ marginRight: 4 }} />
+            )}
+            <Text style={styles.followButtonText}>
               {isFollowing ? 'Following' : 'Follow'}
             </Text>
           </TouchableOpacity>
@@ -76,7 +84,7 @@ export const InterestedPeopleScreen: React.FC<InterestedPeopleScreenProps> = ({ 
         style={styles.backButton}
         onPress={() => navigation.goBack()}
       >
-        <Ionicons name="arrow-back" size={24} color="#333" />
+        <Ionicons name="arrow-back" size={24} color="#fff" />
       </TouchableOpacity>
       <View style={styles.headerInfo}>
         <Text style={styles.headerTitle}>Interested People</Text>
@@ -88,7 +96,7 @@ export const InterestedPeopleScreen: React.FC<InterestedPeopleScreenProps> = ({ 
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <Ionicons name="heart-outline" size={64} color="#ccc" />
+      <Ionicons name="people-outline" size={64} color="#ccc" />
       <Text style={styles.emptyTitle}>No interested people yet</Text>
       <Text style={styles.emptySubtitle}>
         Be the first to show interest in this idea!
@@ -181,25 +189,24 @@ const styles = StyleSheet.create({
     color: '#aaa',
     marginTop: 2,
   },
-
   followButton: {
-    backgroundColor: '#667eea',
+    backgroundColor: 'rgba(37, 174, 248, 1)',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 20,
+    borderRadius: 7,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  followingButton: {
+  followButtonActive: {
     backgroundColor: '#181a20',
-    borderWidth: 1,
-    borderColor: '#667eea',
+    opacity: 0.7,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   followButtonText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
-  },
-  followingButtonText: {
-    color: '#667eea',
   },
   emptyContainer: {
     flex: 1,
@@ -211,13 +218,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#aaa',
+    color: '#ccc',
     marginTop: 16,
     marginBottom: 8,
   },
   emptySubtitle: {
     fontSize: 16,
-    color: '#666',
+    color: '#888',
     textAlign: 'center',
     lineHeight: 24,
   },

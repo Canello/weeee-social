@@ -133,6 +133,7 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ navigation
                 {bioExpanded ? 'See less' : 'See more'}
               </Text>
             )}
+            <View style={{ marginBottom: 20 }} />
           </>
         )}
         <View style={styles.buttonsContainer}>
@@ -497,7 +498,6 @@ const styles = StyleSheet.create({
   seeMore: {
     color: '#fff',
     marginLeft: 24,
-    marginBottom: 20,
     paddingTop: 8,
     paddingBottom: 8,
     fontWeight: '600',
