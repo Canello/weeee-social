@@ -156,8 +156,8 @@ export const mockIdeas: Idea[] = [
     creatorId: '1',
     creator: mockUsers[0],
     imageUrl: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400',
-    interestedUsers: ['2', '3', '5', '7'], // 4 < 6
-    interestedUsersPreview: [mockUsers[1], mockUsers[2], mockUsers[4]],
+    interestedUsers: ['2', '3', '4', '5', '6', '7'], // 6 >= 6
+    interestedUsersPreview: [mockUsers[1], mockUsers[2], mockUsers[3]],
     minimumInterested: 6,
     expirationDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now (normal - blue)
     location: '',

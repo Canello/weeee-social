@@ -9,11 +9,17 @@ import {
   ScrollView,
   Animated,
   TouchableWithoutFeedback,
+  Modal,
+  findNodeHandle,
+  UIManager,
 } from 'react-native';
+import type { View as ViewType } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { FeedItem } from '../types';
 import dayjs from 'dayjs';
 import { LinearGradient } from 'expo-linear-gradient';
+import { getCurrentUser } from '../utils/mockData';
+import { BlurView } from 'expo-blur';
 
 interface IdeaCardProps {
   item: FeedItem;
@@ -32,6 +38,10 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
   const [expanded, setExpanded] = useState(false);
   const animation = useRef(new Animated.Value(0)).current;
   const contentHeight = useRef(0);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [menuPosition, setMenuPosition] = useState<{x: number, y: number}>({x: 0, y: 0});
+  const threeDotsRef = useRef<ViewType | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     Animated.timing(animation, {
@@ -76,6 +86,21 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
     }
   };
 
+  const MENU_WIDTH = 140;
+
+  const handleThreeDotsPress = () => {
+    if (threeDotsRef.current) {
+      const handle = findNodeHandle(threeDotsRef.current);
+      if (handle) {
+        UIManager.measure(handle, (fx, fy, width, height, px, py) => {
+          // Align right side of menu with right side of icon
+          setMenuPosition({ x: px + width - MENU_WIDTH, y: py + height + 8 });
+          setMenuVisible(true);
+        });
+      }
+    }
+  };
+
   // Calculate time left
   const now = new Date();
   const diffMs = idea.expirationDate.getTime() - now.getTime();
@@ -100,6 +125,9 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
     timeLeftText = 'Expired';
     pillStyle = styles.timeLeftPillRed;
   }
+
+  const currentUser = getCurrentUser();
+  const isCreator = currentUser.id === idea.creatorId;
 
   return (
     <View style={styles.container}>
@@ -131,6 +159,14 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
           <View style={styles.headerIcons}>
             <TouchableOpacity onPress={() => { /* TODO: implement share */ }} style={styles.headerIconButton}>
               <Ionicons name="arrow-redo-outline" size={22} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleThreeDotsPress}
+              style={styles.headerIconButton}
+            >
+              <View ref={threeDotsRef} collapsable={false} style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <Ionicons name="ellipsis-vertical" size={20} color="#eee" />
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -279,24 +315,114 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
             </View>
           )}
           <View style={styles.actions}>
-            <TouchableOpacity
-              style={[styles.confirmButton, isInterested && styles.confirmButtonActive]}
-              onPress={() => onInterest(idea.id)}
-            >
-              {isInterested && (
-                <Ionicons
-                  name="checkmark-circle"
-                  size={18}
-                  color="#2ed573"
-                />
-              )}
-              <Text style={[styles.confirmButtonText, isInterested && styles.confirmButtonTextActive]}>
-                {isInterested ? 'Interested' : 'Show interest'}
-              </Text>
-            </TouchableOpacity>
+            {isCreator ? (
+              <TouchableOpacity
+                style={[
+                  styles.createEventButton,
+                  idea.interestedUsers.length < idea.minimumInterested && styles.createEventButtonDisabled
+                ]}
+                disabled={idea.interestedUsers.length < idea.minimumInterested}
+                onPress={() => {/* TODO: handle create event */}}
+              >
+                <Text style={[
+                  styles.createEventButtonText,
+                  idea.interestedUsers.length < idea.minimumInterested && styles.createEventButtonTextDisabled
+                ]}>
+                  {idea.interestedUsers.length < idea.minimumInterested
+                    ? 'Create Event (minimum not met)'
+                    : 'Create Event'}
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={[styles.confirmButton, isInterested && styles.confirmButtonActive]}
+                onPress={() => onInterest(idea.id)}
+              >
+                {isInterested && (
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={18}
+                    color="#2ed573"
+                  />
+                )}
+                <Text style={[styles.confirmButtonText, isInterested && styles.confirmButtonTextActive]}>
+                  {isInterested ? 'Interested' : 'Show interest'}
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </View>
+      <Modal
+        visible={menuVisible}
+        transparent
+        animationType="none"
+        onRequestClose={() => setMenuVisible(false)}
+      >
+        <TouchableOpacity
+          style={StyleSheet.absoluteFill}
+          activeOpacity={1}
+          onPress={() => setMenuVisible(false)}
+        >
+          <View />
+        </TouchableOpacity>
+        <View
+          style={[
+            styles.menuPopover,
+            {
+              position: 'absolute',
+              left: menuPosition.x,
+              top: menuPosition.y,
+              zIndex: 1000,
+              width: MENU_WIDTH,
+            },
+          ]}
+        >
+          <TouchableOpacity style={styles.menuItem} onPress={() => { setMenuVisible(false); /* TODO: handle report */ }}>
+            <View style={styles.menuItemRow}>
+              <Ionicons name="flag-outline" size={18} color="#fff" style={styles.menuItemIcon} />
+              <Text style={styles.menuItemText}>Report</Text>
+            </View>
+          </TouchableOpacity>
+          {isCreator && (
+            <TouchableOpacity style={styles.menuItem} onPress={() => { setMenuVisible(false); /* TODO: handle edit */ }}>
+              <View style={styles.menuItemRow}>
+                <Ionicons name="create-outline" size={18} color="#fff" style={styles.menuItemIcon} />
+                <Text style={styles.menuItemText}>Edit</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          {isCreator && (
+            <TouchableOpacity style={styles.menuItem} onPress={() => { setMenuVisible(false); setShowDeleteModal(true); }}>
+              <View style={styles.menuItemRow}>
+                <Ionicons name="trash-outline" size={18} color="#ef4444" style={styles.menuItemIcon} />
+                <Text style={[styles.menuItemText, { color: '#ef4444' }]}>Delete</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        </View>
+      </Modal>
+      {showDeleteModal && (
+        <View style={[StyleSheet.absoluteFill, { justifyContent: 'center', alignItems: 'center', zIndex: 2000 }]}> 
+          <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.45)' }} />
+          <View style={styles.modalContent}>
+            <View style={styles.modalTextContainer}>
+              <Text style={styles.modalTitle}>Delete Idea?</Text>
+              <Text style={styles.modalMessage}>
+                Are you sure you want to delete this idea? This action cannot be undone.
+              </Text>
+            </View>
+            <View style={styles.modalActions}>
+              <TouchableOpacity style={styles.modalButton} onPress={() => setShowDeleteModal(false)}>
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.modalButton, styles.modalButtonDanger]} onPress={() => { setShowDeleteModal(false); /* TODO: handle delete idea */ }}>
+                <Text style={[styles.modalButtonText, styles.modalButtonDangerText]}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -507,5 +633,115 @@ const styles = StyleSheet.create({
   },
   interestedPillTextMet: {
     color: '#4ed164', // green tone
+  },
+  createEventButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#22c55e',
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  createEventButtonDisabled: {
+    backgroundColor: '#a8a7a7', // neutral grey
+  },
+  createEventButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  createEventButtonTextDisabled: {
+    color: '#6e6e6e', // dark grey for disabled
+  },
+  menuOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  menuPopover: {
+    backgroundColor: '#222',
+    borderRadius: 8,
+    paddingVertical: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  menuItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+  },
+  menuItemText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  menuItemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  menuItemIcon: {
+    marginRight: 10,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  overlayTint: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  modalContent: {
+    backgroundColor: '#23242a',
+    borderRadius: 16,
+    width: '80%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    overflow: 'hidden',
+  },
+  modalTextContainer: {
+    padding: 28,
+    paddingBottom: 8,
+  },
+  modalTitle: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  modalMessage: {
+    color: '#ccc',
+    fontSize: 16,
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 16,
+    backgroundColor: '#333',
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  modalButtonDanger: {
+    backgroundColor: '#b53a3d',
+  },
+  modalButtonDangerText: {
+    color: '#fff',
   },
 }); 
