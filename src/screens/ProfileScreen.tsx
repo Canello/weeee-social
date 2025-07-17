@@ -204,34 +204,33 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         transparent
         onRequestClose={() => setSelectedIdea(null)}
       >
-        <TouchableWithoutFeedback onPress={() => setSelectedIdea(null)}>
-          <View style={styles.overlayModal}>
-            <BlurView
-              experimentalBlurMethod='dimezisBlurView'
-              intensity={15}
-              tint='dark'
-              style={styles.overlayTint}
-              pointerEvents="none"
-            />
-            <TouchableWithoutFeedback onPress={() => {}}>
-              <View style={styles.overlayCardContainer}>
-                {selectedIdea && (
-                  <IdeaCard
-                    item={selectedIdea}
-                    onInterest={handleInterest}
-                    navigation={navigation}
-                  />
-                )}
-                <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={() => setSelectedIdea(null)}
-                >
-                  <Ionicons name="close" size={24} color="#fff" />
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
+        <View style={styles.overlayModal}>
+          <BlurView
+            experimentalBlurMethod='dimezisBlurView'
+            intensity={15}
+            tint='dark'
+            style={styles.overlayTint}
+            pointerEvents="none"
+          />
+          <TouchableWithoutFeedback onPress={() => setSelectedIdea(null)}>
+            <View style={{...StyleSheet.absoluteFillObject}} />
+          </TouchableWithoutFeedback>
+          <View style={styles.overlayCardContainer}>
+            {selectedIdea && (
+              <IdeaCard
+                item={selectedIdea}
+                onInterest={handleInterest}
+                navigation={navigation}
+              />
+            )}
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setSelectedIdea(null)}
+            >
+              <Ionicons name="close" size={24} color="#fff" />
+            </TouchableOpacity>
           </View>
-        </TouchableWithoutFeedback>
+        </View>
       </Modal>
     </SafeAreaView>
   );
