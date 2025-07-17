@@ -223,13 +223,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                 navigation={navigation}
               />
             )}
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setSelectedIdea(null)}
-            >
-              <Ionicons name="close" size={24} color="#fff" />
-            </TouchableOpacity>
           </View>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setSelectedIdea(null)}
+          >
+            <Ionicons name="close" size={24} color="#fff" />
+          </TouchableOpacity>
         </View>
       </Modal>
     </SafeAreaView>
@@ -405,7 +405,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   overlayCardContainer: {
-    position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'transparent',

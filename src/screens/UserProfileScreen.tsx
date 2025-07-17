@@ -236,13 +236,13 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ navigation
                 navigation={navigation}
               />
             )}
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setSelectedIdea(null)}
-            >
-              <Ionicons name="close" size={24} color="#fff" />
-            </TouchableOpacity>
           </View>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setSelectedIdea(null)}
+          >
+            <Ionicons name="close" size={24} color="#fff" />
+          </TouchableOpacity>
         </View>
       </Modal>
     </SafeAreaView>
@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     width: 56,
     height: 56,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
