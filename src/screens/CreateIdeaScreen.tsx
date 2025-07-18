@@ -32,7 +32,7 @@ export const CreateIdeaScreen: React.FC<CreateIdeaScreenProps> = ({
   const [imageUrl, setImageUrl] = useState('');
   const [minimumInterested, setMinimumInterested] = useState('');
   const [expirationOption, setExpirationOption] = useState<'24h' | '3days' | '1week'>('3days');
-  const [visibilityOption, setVisibilityOption] = useState<'followers' | 'followers-share' | 'public'>('followers');
+  const [visibilityOption, setVisibilityOption] = useState<'followers' | 'followers-share' | 'followers-of-followers' | 'public'>('followers');
   const [location, setLocation] = useState('');
   const [showDiscardModal, setShowDiscardModal] = useState(false);
 
@@ -201,6 +201,19 @@ export const CreateIdeaScreen: React.FC<CreateIdeaScreenProps> = ({
                   <View style={styles.radioTextContainer}>
                     <Text style={styles.radioLabel}>Followers can share</Text>
                     <Text style={styles.radioDescription}>Only followers and people they share it with.</Text>
+                  </View>
+                </TouchableOpacity>
+                
+                <TouchableOpacity
+                  style={styles.radioOption}
+                  onPress={() => setVisibilityOption('followers-of-followers')}
+                >
+                  <View style={styles.radioButton}>
+                    {visibilityOption === 'followers-of-followers' && <View style={styles.radioButtonSelected} />}
+                  </View>
+                  <View style={styles.radioTextContainer}>
+                    <Text style={styles.radioLabel}>Followers of followers</Text>
+                    <Text style={styles.radioDescription}>Followers, followers of followers, and people they share it with.</Text>
                   </View>
                 </TouchableOpacity>
                 
