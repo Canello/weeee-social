@@ -29,6 +29,28 @@ interface IdeaCardProps {
 
 const { width } = Dimensions.get('window');
 
+// Helper to serialize all Date objects in FeedItem
+function serializeIdeaForNavigation(feedItem: FeedItem) {
+  const { idea, ...rest } = feedItem;
+  return {
+    ...rest,
+    idea: {
+      ...idea,
+      createdAt: idea.createdAt instanceof Date ? idea.createdAt.toISOString() : idea.createdAt,
+      updatedAt: idea.updatedAt instanceof Date ? idea.updatedAt.toISOString() : idea.updatedAt,
+      expirationDate: idea.expirationDate instanceof Date ? idea.expirationDate.toISOString() : idea.expirationDate,
+      creator: {
+        ...idea.creator,
+        createdAt: idea.creator.createdAt instanceof Date ? idea.creator.createdAt.toISOString() : idea.creator.createdAt,
+      },
+      interestedUsersPreview: idea.interestedUsersPreview.map(user => ({
+        ...user,
+        createdAt: user.createdAt instanceof Date ? user.createdAt.toISOString() : user.createdAt,
+      })),
+    },
+  };
+}
+
 export const IdeaCard: React.FC<IdeaCardProps> = ({
   item,
   onInterest,
@@ -442,7 +464,10 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
                 style={[styles.modalButton, { backgroundColor: '#22c55e' }]}
                 onPress={() => {
                   setShowCreateEventModal(false);
-                  // TODO: handle create event logic
+                  if (navigation) {
+                    const serializableItem = serializeIdeaForNavigation(item);
+                    navigation.navigate('CreateEvent', { idea: serializableItem });
+                  }
                 }}
               >
                 <Text style={[styles.modalButtonText, { color: '#fff' }]}>Create</Text>
@@ -474,7 +499,13 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalButton, styles.modalButtonBorderLeft]}
-                onPress={() => setShowMinimumNotMetModal(false)}
+                onPress={() => {
+                  setShowMinimumNotMetModal(false);
+                  if (navigation) {
+                    const serializableItem = serializeIdeaForNavigation(item);
+                    navigation.navigate('CreateEvent', { idea: serializableItem });
+                  }
+                }}
               >
                 <Text style={styles.modalButtonText}>Create</Text>
               </TouchableOpacity>

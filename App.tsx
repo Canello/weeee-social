@@ -15,6 +15,7 @@ import { ProfileScreen } from './src/screens/ProfileScreen';
 import { UserProfileScreen } from './src/screens/UserProfileScreen';
 import { FollowersListScreen } from './src/screens/FollowersListScreen';
 import { InterestedPeopleScreen } from './src/screens/InterestedPeopleScreen';
+import CreateEventScreen from './src/screens/CreateEventScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -119,6 +120,13 @@ function AppNavigator() {
       <Stack.Screen
         name="InterestedPeople"
         component={InterestedPeopleScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="CreateEvent"
+        component={CreateEventScreen}
         options={{
           headerShown: false,
         }}
