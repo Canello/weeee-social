@@ -42,6 +42,8 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
   const [menuPosition, setMenuPosition] = useState<{x: number, y: number}>({x: 0, y: 0});
   const threeDotsRef = useRef<ViewType | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showCreateEventModal, setShowCreateEventModal] = useState(false);
+  const [showMinimumNotMetModal, setShowMinimumNotMetModal] = useState(false);
 
   useEffect(() => {
     Animated.timing(animation, {
@@ -231,12 +233,6 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
                     </Text>
                   </View>
                 </TouchableOpacity>
-                {idea.location && idea.location.trim() !== '' && (
-                  <View style={styles.detailRow}>
-                    <Ionicons name="location-outline" size={14} color="#fff" />
-                    <Text style={styles.detailText}>{idea.location}</Text>
-                  </View>
-                )}
                 <View style={styles.divider} />
                 <Text style={styles.description}>
                   {idea.description}
@@ -299,12 +295,6 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
                   </Text>
                 </View>
               </TouchableOpacity>
-              {idea.location && idea.location.trim() !== '' && (
-                <View style={styles.detailRow}>
-                  <Ionicons name="location-outline" size={14} color="#fff" />
-                  <Text style={styles.detailText}>{idea.location}</Text>
-                </View>
-              )}
               <View style={styles.divider} />
               <Text style={styles.description} numberOfLines={2}>
                 {idea.description}
@@ -321,8 +311,13 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
                   styles.createEventButton,
                   idea.interestedUsers.length < idea.minimumInterested && styles.createEventButtonDisabled
                 ]}
-                disabled={idea.interestedUsers.length < idea.minimumInterested}
-                onPress={() => {/* TODO: handle create event */}}
+                onPress={() => {
+                  if (idea.interestedUsers.length < idea.minimumInterested) {
+                    setShowMinimumNotMetModal(true);
+                  } else {
+                    setShowCreateEventModal(true);
+                  }
+                }}
               >
                 <Text style={[
                   styles.createEventButtonText,
@@ -404,7 +399,7 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
       </Modal>
       {showDeleteModal && (
         <View style={[StyleSheet.absoluteFill, { justifyContent: 'center', alignItems: 'center', zIndex: 2000 }]}> 
-          <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.45)' }} />
+          <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.85)' }} />
           <View style={styles.modalContent}>
             <View style={styles.modalTextContainer}>
               <Text style={styles.modalTitle}>Delete Idea?</Text>
@@ -418,6 +413,70 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
               </TouchableOpacity>
               <TouchableOpacity style={[styles.modalButton, styles.modalButtonDanger]} onPress={() => { setShowDeleteModal(false); /* TODO: handle delete idea */ }}>
                 <Text style={[styles.modalButtonText, styles.modalButtonDangerText]}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
+      {/* Create Event Confirmation Modal */}
+      {showCreateEventModal && (
+        <View style={[StyleSheet.absoluteFill, { justifyContent: 'center', alignItems: 'center', zIndex: 2000 }]}> 
+          <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.85)' }} />
+          <View style={styles.modalContent}>
+            <View style={styles.modalTextContainer}>
+              <Text style={styles.modalTitle}>Create Event?</Text>
+              <Text style={styles.modalMessage}>
+                Once you finished creating the event, this idea will disappear.
+                <Text style={{ fontWeight: 'bold' }}>
+                </Text>
+              </Text>
+            </View>
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => setShowCreateEventModal(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, { backgroundColor: '#22c55e' }]}
+                onPress={() => {
+                  setShowCreateEventModal(false);
+                  // TODO: handle create event logic
+                }}
+              >
+                <Text style={[styles.modalButtonText, { color: '#fff' }]}>Create</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
+      {/* Minimum Not Met Modal */}
+      {showMinimumNotMetModal && (
+        <View style={[StyleSheet.absoluteFill, { justifyContent: 'center', alignItems: 'center', zIndex: 2000 }]}> 
+          <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.85)' }} />
+          <View style={styles.modalContent}>
+            <View style={styles.modalTextContainer}>
+              <Text style={styles.modalTitle}>Create Event?</Text>
+              <Text style={styles.modalMessage}>
+                <Text style={{ color: '#e66a6f'}}>
+                  The minimum number of people was not met yet!{"\n\n"}
+                </Text>
+                Once you finished creating the event, this idea will disappear.
+              </Text>
+            </View>
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => setShowMinimumNotMetModal(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonBorderLeft]}
+                onPress={() => setShowMinimumNotMetModal(false)}
+              >
+                <Text style={styles.modalButtonText}>Create</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -644,7 +703,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   createEventButtonDisabled: {
-    backgroundColor: '#a8a7a7', // neutral grey
+    backgroundColor: 'rgba(15,15,15,0.7)', // neutral grey
+    borderWidth: 1,
+    borderColor: '#777',
   },
   createEventButtonText: {
     color: '#fff',
@@ -652,7 +713,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   createEventButtonTextDisabled: {
-    color: '#6e6e6e', // dark grey for disabled
+    color: '#aaa', // dark grey for disabled
   },
   menuOverlay: {
     flex: 1,
@@ -743,5 +804,8 @@ const styles = StyleSheet.create({
   },
   modalButtonDangerText: {
     color: '#fff',
+  },
+  modalButtonBorderLeft: {
+    borderLeftWidth: 1, borderLeftColor: '#555'
   },
 }); 
