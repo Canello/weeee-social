@@ -23,6 +23,7 @@ export interface Idea {
   location: string;
   createdAt: Date;
   updatedAt: Date;
+  visibilityOption: 'followers' | 'followers-share' | 'public';
 }
 
 export interface Interest {

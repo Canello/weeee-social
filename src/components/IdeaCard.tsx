@@ -351,21 +351,21 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
                 </Text>
               </TouchableOpacity>
             ) : (
-              <TouchableOpacity
-                style={[styles.confirmButton, isInterested && styles.confirmButtonActive]}
-                onPress={() => onInterest(idea.id)}
-              >
-                {isInterested && (
-                  <Ionicons
-                    name="checkmark-circle"
-                    size={18}
-                    color="#2ed573"
-                  />
-                )}
-                <Text style={[styles.confirmButtonText, isInterested && styles.confirmButtonTextActive]}>
-                  {isInterested ? 'Interested' : 'Show interest'}
-                </Text>
-              </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.confirmButton, isInterested && styles.confirmButtonActive]}
+              onPress={() => onInterest(idea.id)}
+            >
+              {isInterested && (
+                <Ionicons
+                  name="checkmark-circle"
+                  size={18}
+                  color="#2ed573"
+                />
+              )}
+              <Text style={[styles.confirmButtonText, isInterested && styles.confirmButtonTextActive]}>
+                {isInterested ? 'Interested' : 'Show interest'}
+              </Text>
+            </TouchableOpacity>
             )}
           </View>
         </View>

@@ -200,7 +200,7 @@ export const CreateIdeaScreen: React.FC<CreateIdeaScreenProps> = ({
                   </View>
                   <View style={styles.radioTextContainer}>
                     <Text style={styles.radioLabel}>Followers can share</Text>
-                    <Text style={styles.radioDescription}>Only followers and people they share it with.</Text>
+                    <Text style={styles.radioDescription}>Followers and people they share the link with.</Text>
                   </View>
                 </TouchableOpacity>
                 

@@ -118,6 +118,7 @@ export const mockIdeas: Idea[] = [
     location: 'Central Park, New York',
     createdAt: new Date('2024-07-01'),
     updatedAt: new Date('2024-07-01'),
+    visibilityOption: 'followers',
   },
   {
     id: '2',
@@ -133,6 +134,7 @@ export const mockIdeas: Idea[] = [
     location: 'Tech Hub Downtown, San Francisco',
     createdAt: new Date('2024-07-05'),
     updatedAt: new Date('2024-07-05'),
+    visibilityOption: 'followers-share',
   },
   {
     id: '3',
@@ -148,6 +150,7 @@ export const mockIdeas: Idea[] = [
     location: 'Community Garden, Brooklyn',
     createdAt: new Date('2024-07-08'),
     updatedAt: new Date('2024-07-08'),
+    visibilityOption: 'public',
   },
   {
     id: '4',
@@ -163,6 +166,7 @@ export const mockIdeas: Idea[] = [
     location: '',
     createdAt: new Date('2024-07-10'),
     updatedAt: new Date('2024-07-10'),
+    visibilityOption: 'followers',
   },
   {
     id: '5',
@@ -178,6 +182,7 @@ export const mockIdeas: Idea[] = [
     location: '',
     createdAt: new Date('2024-07-12'),
     updatedAt: new Date('2024-07-12'),
+    visibilityOption: 'followers',
   },
   {
     id: '6',
@@ -193,6 +198,7 @@ export const mockIdeas: Idea[] = [
     location: 'Mountain Trail, Colorado',
     createdAt: new Date('2024-07-15'),
     updatedAt: new Date('2024-07-15'),
+    visibilityOption: 'followers',
   },
   {
     id: '7',
@@ -208,6 +214,7 @@ export const mockIdeas: Idea[] = [
     location: 'City Park, Portland',
     createdAt: new Date('2024-07-18'),
     updatedAt: new Date('2024-07-18'),
+    visibilityOption: 'followers',
   },
   {
     id: 'longdesc1',
@@ -232,6 +239,7 @@ Bring your laptop, creativity, and team spirit! All experience levels welcome. L
     location: 'Tech Hub Downtown',
     createdAt: new Date(),
     updatedAt: new Date(),
+    visibilityOption: 'followers',
   },
 ];
 
