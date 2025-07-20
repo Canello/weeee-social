@@ -173,29 +173,37 @@ function CreateEventScreen({ route, navigation }: { route: any; navigation: any 
                   { key: 'nearby', label: 'People nearby' },
                 ].map(option => {
                   const selected = visibility.includes(option.key);
+                  const isInvited = option.key === 'invited';
                   return (
                     <TouchableOpacity
                       key={option.key}
                       style={[
                         styles.tag,
                         !selected && styles.tagUnselected,
-                        selected && styles.tagSelected,
+                        selected && (isInvited ? styles.tagSelectedActive : styles.tagSelected),
                       ]}
                       onPress={() => {
-                        setVisibility(v =>
-                          v.includes(option.key)
-                            ? v.filter(val => val !== option.key)
-                            : [...v, option.key]
-                        );
+                        if (!isInvited) {
+                          setVisibility(v =>
+                            v.includes(option.key)
+                              ? v.filter(val => val !== option.key)
+                              : [...v, option.key]
+                          );
+                        }
                       }}
+                      activeOpacity={isInvited ? 1 : 0.7}
+                      disabled={isInvited}
                     >
                       <View style={styles.tagContent}>
                         {selected ? (
-                          <Ionicons name="checkmark" size={16} color="#1e6b3a" style={{ marginRight: 4 }} />
+                          <Ionicons name="checkmark" size={16} color={isInvited ? "#333" : "#1e6b3a"} style={{ marginRight: 4 }} />
                         ) : (
                           <Ionicons name="close" size={16} color="#aaa" style={{ marginRight: 4 }} />
                         )}
-                        <Text style={[styles.tagText, selected && styles.tagTextSelected]}>
+                        <Text style={[
+                          styles.tagText,
+                          selected && (isInvited ? styles.tagTextSelectedActive : styles.tagTextSelected),
+                        ]}>
                           {option.label}
                         </Text>
                       </View>
@@ -607,8 +615,8 @@ const styles = StyleSheet.create({
   inviteButton: {
     backgroundColor: '#18181b',
     borderRadius: 7,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingHorizontal: 17,
+    paddingVertical: 7,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -616,12 +624,12 @@ const styles = StyleSheet.create({
     borderColor: '#777',
   },
   inviteButtonActive: {
-    backgroundColor: '#98edb6',
+    backgroundColor: '#90e0ac',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#98edb6',
+    borderColor: '#90e0ac',
   },
   inviteButtonText: {
     color: '#aaa',
@@ -693,13 +701,14 @@ const styles = StyleSheet.create({
     borderColor: '#777',
   },
   tagSelected: {
-    backgroundColor: '#98edb6',
+    backgroundColor: '#90e0ac',
+    borderColor: '#90e0ac',
     borderWidth: 1,
-    borderColor: '#98edb6'
   },
-  tagContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  tagSelectedActive: {
+    backgroundColor: '#C5E3F6',
+    borderColor: '#C5E3F6',
+    borderWidth: 1,
   },
   tagText: {
     color: '#aaa',
@@ -708,6 +717,10 @@ const styles = StyleSheet.create({
   },
   tagTextSelected: {
     color: '#1e6b3a',
+    fontWeight: '700',
+  },
+  tagTextSelectedActive: {
+    color: '#333',
     fontWeight: '700',
   },
   ticketCard: {
@@ -767,6 +780,10 @@ const styles = StyleSheet.create({
   },
   trashButtonDisabled: {
     backgroundColor: '#23242a',
+  },
+  tagContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
   }
 });
 
