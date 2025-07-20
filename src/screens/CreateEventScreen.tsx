@@ -10,6 +10,7 @@ import {
   Switch,
   Platform,
   Image,
+  ScrollView,
 } from 'react-native';
 // Remove DateTimePicker import
 // import DateTimePicker from '@react-native-community/datetimepicker';
@@ -80,8 +81,7 @@ function CreateEventScreen({ route, navigation }: { route: any; navigation: any 
       let priceError = '';
       if (!ticket.name.trim()) nameError = 'Required';
       else if (nameCounts[ticket.name.trim()] > 1) nameError = 'Duplicate';
-      if (!ticket.price.trim()) priceError = 'Required';
-      else if (isNaN(Number(ticket.price)) || Number(ticket.price) <= 0) priceError = 'Invalid';
+      if (isNaN(Number(ticket.price)) || Number(ticket.price) < 0) priceError = 'Invalid';
       return { ...ticket, nameError, priceError };
     });
   }
@@ -135,8 +135,8 @@ function CreateEventScreen({ route, navigation }: { route: any; navigation: any 
                     >
                       {isInvited ? (
                         <>
-                          <Ionicons name="checkmark" size={16} color="#1e6b3a" style={{ marginRight: 4 }} />
-                          <Text style={[styles.inviteButtonText, { color: '#1e6b3a' }]}>Invited</Text>
+                          <Ionicons name="checkmark" size={16} color="#333" style={{ marginRight: 4 }} />
+                          <Text style={[styles.inviteButtonText, { color: '#333' }]}>Invited</Text>
                         </>
                       ) : (
                         <>
@@ -164,7 +164,7 @@ function CreateEventScreen({ route, navigation }: { route: any; navigation: any 
               placeholderTextColor="#888"
             />
             <View style={[styles.inputGroup, { marginTop: 24 }]}>
-              <Text style={styles.label}>Visibility</Text>
+              <Text style={styles.label}>Who can see the event?</Text>
               <View style={styles.tagContainer}>
                 {[
                   { key: 'invited', label: 'Invited people' },
@@ -196,7 +196,7 @@ function CreateEventScreen({ route, navigation }: { route: any; navigation: any 
                     >
                       <View style={styles.tagContent}>
                         {selected ? (
-                          <Ionicons name="checkmark" size={16} color={isInvited ? "#333" : "#1e6b3a"} style={{ marginRight: 4 }} />
+                          <Ionicons name="checkmark" size={16} color={"#333"} style={{ marginRight: 4 }} />
                         ) : (
                           <Ionicons name="close" size={16} color="#aaa" style={{ marginRight: 4 }} />
                         )}
@@ -227,7 +227,7 @@ function CreateEventScreen({ route, navigation }: { route: any; navigation: any 
               />
             </View>
             {isPaid && (
-              <>
+              <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 24 }}>
                 {validatedTickets.map((ticket: { name: string; price: string; nameError: string; priceError: string }, idx: number) => (
                   <View key={idx} style={styles.ticketCard}>
                     <View style={styles.ticketRow}>
@@ -247,13 +247,15 @@ function CreateEventScreen({ route, navigation }: { route: any; navigation: any 
                           {ticket.nameError ? ticket.nameError : ' '}
                         </Text>
                       </View>
-                      <View style={{ width: 90 }}>
+                      <View style={styles.ticketPriceInputContainer}>
                         <TextInput
                           style={[styles.input, styles.ticketPriceInput, ticket.priceError && styles.inputError]}
-                          value={ticket.price}
+                          value={formatBRL(ticket.price)}
                           onChangeText={text => {
+                            // Only keep digits, update the raw value in state
+                            const digits = text.replace(/\D/g, '');
                             const newTickets = [...tickets];
-                            newTickets[idx].price = text;
+                            newTickets[idx].price = digits;
                             setTickets(newTickets);
                           }}
                           placeholder="Price"
@@ -272,7 +274,7 @@ function CreateEventScreen({ route, navigation }: { route: any; navigation: any 
                         onPress={() => tickets.length > 1 && setTickets(tickets.filter((_, i) => i !== idx))}
                         disabled={tickets.length === 1}
                       >
-                        <Ionicons name="trash" size={20} color={tickets.length === 1 ? '#555' : '#ef4444'} />
+                        <Ionicons name="trash" size={20} color={tickets.length === 1 ? '#555' : '#999'} />
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -284,18 +286,18 @@ function CreateEventScreen({ route, navigation }: { route: any; navigation: any 
                     { name: '', price: '', nameError: '', priceError: '' }
                   ])}
                 >
-                  <Text style={styles.addTicketButtonText}>+ Add Ticket</Text>
+                  <Ionicons name="add" size={24} color="#fff" />
                 </TouchableOpacity>
-              </>
+              </ScrollView>
             )}
           </View>
         );
       case 3:
         return (
           <View style={{ flex: 1, padding: 20 }}>
-            <Text style={styles.stepLabel}>Description:</Text>
+            <Text style={styles.stepLabel}>Description</Text>
             <TextInput
-              style={[styles.input, { height: 120, textAlignVertical: 'top' }]}
+              style={[styles.input, styles.descriptionInput]}
               value={description}
               onChangeText={setDescription}
               multiline
@@ -368,6 +370,16 @@ function CreateEventScreen({ route, navigation }: { route: any; navigation: any 
     </View>
   );
 };
+
+function formatBRL(value: string) {
+  // Remove all non-digit characters
+  const digits = value.replace(/\D/g, '');
+  // Parse to integer (cents)
+  const intVal = parseInt(digits || '0', 10);
+  // Format as R$ 0,00
+  const cents = (intVal / 100).toFixed(2).replace('.', ',');
+  return `R$ ${cents}`;
+}
 
 const styles = StyleSheet.create({
   headerImage: {
@@ -616,7 +628,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#18181b',
     borderRadius: 7,
     paddingHorizontal: 17,
-    paddingVertical: 7,
+    paddingVertical: 8,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -716,7 +728,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   tagTextSelected: {
-    color: '#1e6b3a',
+    color: '#333',//'#1e6b3a',
     fontWeight: '700',
   },
   tagTextSelectedActive: {
@@ -727,23 +739,27 @@ const styles = StyleSheet.create({
     backgroundColor: '#23242a',
     borderRadius: 12,
     padding: 16,
-    marginBottom: 16,
+    marginBottom: 8,
+    marginHorizontal: 8,
     borderWidth: 1,
     borderColor: '#181a20',
     height: 100,
   },
   addTicketButton: {
     backgroundColor: '#23242a',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 8,
+    width: 60,
+    height: 60,
+    marginTop: 12,
+    alignSelf: 'center',
+    justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#181a20',
+    borderColor: '#444',
   },
-  addTicketButtonText: {
-    color: '#374151',
-    fontSize: 15,
-    fontWeight: '600',
+  descriptionInput: {
+    height: 220,
+    textAlignVertical: 'top'
   },
   inputError: {
     borderColor: '#ef4444',
@@ -764,8 +780,11 @@ const styles = StyleSheet.create({
     marginRight: 8,
     backgroundColor: '#181a20'
   },
+  ticketPriceInputContainer: {
+    width: 100
+  },
   ticketPriceInput: {
-    width: 90,
+    width: 100,
     backgroundColor: '#181a20'
   },
   trashButton: {
@@ -773,8 +792,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#181a20',
     borderRadius: 7,
-    width: 44,
-    height: 44,
+    width: 40,
+    height: 40,
     marginLeft: 12,
     marginTop: 6,
   },
