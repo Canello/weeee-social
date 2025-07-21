@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { FeedItem, User } from '../types';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { CustomSwitch } from '../components/CustomSwitch';
 
 const steps = [
   'Invite Participants',
@@ -219,11 +220,17 @@ function CreateEventScreen({ route, navigation }: { route: any; navigation: any 
           <View style={{ flex: 1, paddingTop: 20 }}>
             <View style={styles.paymentRow}>
               <Text style={styles.stepLabel}>Is paid?</Text>
-              <Switch
+            </View>
+            <Text style={styles.explanationText}>
+              If enabled, you can sell tickets for your event. Invited people will need to buy a ticket to confirm their participation.
+            </Text>
+            <View style={styles.paymentRow}>
+              <CustomSwitch
                 value={isPaid}
                 onValueChange={setIsPaid}
-                thumbColor={isPaid ? '#22c55e' : '#888'}
-                trackColor={{ true: '#bbf7d0', false: '#444' }}
+                style={styles.isPaidSwitch}
+                textOff='Free'
+                textOn='Paid'
               />
             </View>
             {isPaid && (
@@ -436,7 +443,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
-    marginBottom: 12,
+    marginBottom: 4,
   },
   inviteeRow: {
     flexDirection: 'row',
@@ -506,7 +513,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    marginBottom: 20,
+    marginBottom: 4,
+  },
+  isPaidSwitch: {
+    marginTop: 12,
+    marginBottom: 32,
   },
   input: {
     backgroundColor: '#23242a',
@@ -774,6 +785,7 @@ const styles = StyleSheet.create({
   ticketRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
+    marginTop: 8,
   },
   ticketNameInput: {
     flex: 1,
@@ -803,7 +815,12 @@ const styles = StyleSheet.create({
   tagContent: {
     flexDirection: 'row',
     alignItems: 'center',
-  }
+  },
+  explanationText: {
+    color: '#888',
+    fontSize: 13,
+    marginHorizontal: 20,
+  },
 });
 
 export default CreateEventScreen; 
