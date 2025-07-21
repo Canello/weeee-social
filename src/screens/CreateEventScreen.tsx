@@ -222,7 +222,7 @@ function CreateEventScreen({ route, navigation }: { route: any; navigation: any 
               <Text style={styles.stepLabel}>Is paid?</Text>
             </View>
             <Text style={styles.explanationText}>
-              If enabled, you can sell tickets for your event. Invited people will need to buy a ticket to confirm their participation.
+              If enabled, you can sell tickets for your event. Invited people will need to buy a ticket when confirming participation.
             </Text>
             <View style={styles.paymentRow}>
               <CustomSwitch
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   isPaidSwitch: {
-    marginTop: 12,
+    marginTop: 16,
     marginBottom: 32,
   },
   input: {
