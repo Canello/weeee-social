@@ -22,13 +22,6 @@ interface ProfileScreenProps {
   navigation: any;
 }
 
-interface ProfileFilterTagsProps {
-  selectedCreated: boolean;
-  setSelectedCreated: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedInterested: boolean;
-  setSelectedInterested: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
 interface FilterTagProps {
   label: string;
   selected: boolean;
@@ -39,8 +32,7 @@ const FilterTag: React.FC<FilterTagProps> = ({ label, selected, onPress }) => (
   <TouchableOpacity
     style={[
       styles.filterTag,
-      !selected && styles.filterTagUnselected,
-      selected && styles.filterTagSelected,
+      selected && styles.filterTagSelected
     ]}
     onPress={onPress}
     activeOpacity={0.7}
@@ -64,6 +56,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const [bioShouldCollapse, setBioShouldCollapse] = useState(false);
   const [selectedCreated, setSelectedCreated] = useState(true);
   const [selectedInterested, setSelectedInterested] = useState(true);
+  const [activeTab, setActiveTab] = useState<'ideas' | 'events'>('ideas');
+
+  // Event tab tag states
+  const [selectedInvited, setSelectedInvited] = useState(true);
+  const [selectedAttendee, setSelectedAttendee] = useState(true);
+  const [selectedAdmin, setSelectedAdmin] = useState(true);
+  const [selectedPast, setSelectedPast] = useState(false);
 
   const userIdeas = mockIdeas.filter(idea => idea.creatorId === currentUser.id);
   const userFeedItems: FeedItem[] = userIdeas.map(idea => ({
@@ -237,56 +236,106 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       <ScrollView showsVerticalScrollIndicator={false}>
         {renderHeader()}
         <View style={{ paddingHorizontal: 16, marginTop: 24 }}>
-          {/* Tag toggles styled like CreateEventScreen */}
-          <View style={styles.filterTagContainer}>
-            <FilterTag
-              label="Created by me"
-              selected={selectedCreated}
-              onPress={() => setSelectedCreated((prev: boolean) => !prev)}
-            />
-            <FilterTag
-              label="Interested"
-              selected={selectedInterested}
-              onPress={() => setSelectedInterested((prev: boolean) => !prev)}
-            />
+          {/* Tab bar */}
+          <View style={styles.tabBarProfile}>
+            <TouchableOpacity
+              style={[styles.tabProfile, activeTab === 'ideas' && styles.tabProfileActive]}
+              onPress={() => setActiveTab('ideas')}
+            >
+              <Text style={[styles.tabProfileText, activeTab === 'ideas' && styles.tabProfileTextActive]}>My Ideas</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tabProfile, activeTab === 'events' && styles.tabProfileActive]}
+              onPress={() => setActiveTab('events')}
+            >
+              <Text style={[styles.tabProfileText, activeTab === 'events' && styles.tabProfileTextActive]}>My Events</Text>
+            </TouchableOpacity>
           </View>
-          {filteredFeedItems.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Ionicons name="bulb-outline" size={64} color="#ccc" />
-              <Text style={styles.emptyTitle}>No ideas or interests yet</Text>
-              <Text style={styles.emptySubtitle}>
-                Share your first idea or show interest in others!
-              </Text>
-              <TouchableOpacity
-                style={styles.createButton}
-                onPress={() => navigation.navigate('CreateIdea')}
-              >
-                <Text style={styles.createButtonText}>Create Idea</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.exploreButton, { marginTop: 12 }]}
-                onPress={() => navigation.navigate('Explore')}
-              >
-                <Text style={styles.exploreButtonText}>Explore Ideas</Text>
-              </TouchableOpacity>
+
+          {activeTab === 'ideas' ? (
+            <View style={styles.filterTagContainer}>
+              <FilterTag
+                label="Created by me"
+                selected={selectedCreated}
+                onPress={() => setSelectedCreated((prev: boolean) => !prev)}
+              />
+              <FilterTag
+                label="Interested"
+                selected={selectedInterested}
+                onPress={() => setSelectedInterested((prev: boolean) => !prev)}
+              />
             </View>
           ) : (
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
-              {filteredFeedItems.map((item, idx) => (
-                <View
-                  key={item.idea.id}
-                  style={{
-                    width: '31%', // 3 per row with small gaps
-                    marginBottom: 16,
-                    marginRight: (idx + 1) % 3 === 0 ? 0 : '3.5%',
-                  }}
+            <View style={styles.filterTagContainer}>
+              <FilterTag
+                label="Invited"
+                selected={selectedInvited}
+                onPress={() => setSelectedInvited((prev: boolean) => !prev)}
+              />
+              <FilterTag
+                label="Attendee"
+                selected={selectedAttendee}
+                onPress={() => setSelectedAttendee((prev: boolean) => !prev)}
+              />
+              <FilterTag
+                label="Admin"
+                selected={selectedAdmin}
+                onPress={() => setSelectedAdmin((prev: boolean) => !prev)}
+              />
+              <FilterTag
+                label="Past events"
+                selected={selectedPast}
+                onPress={() => setSelectedPast((prev: boolean) => !prev)}
+              />
+            </View>
+          )}
+          {activeTab === 'ideas' ? (
+            filteredFeedItems.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Ionicons name="bulb-outline" size={64} color="#ccc" />
+                <Text style={styles.emptyTitle}>No ideas or interests yet</Text>
+                <Text style={styles.emptySubtitle}>
+                  Share your first idea or show interest in others!
+                </Text>
+                <TouchableOpacity
+                  style={styles.createButton}
+                  onPress={() => navigation.navigate('CreateIdea')}
                 >
-                  <MiniIdeaCard
-                    item={item}
-                    onPress={() => setSelectedIdea(item)}
-                  />
-                </View>
-              ))}
+                  <Text style={styles.createButtonText}>Create Idea</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.exploreButton, { marginTop: 12 }]}
+                  onPress={() => navigation.navigate('Explore')}
+                >
+                  <Text style={styles.exploreButtonText}>Explore Ideas</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
+                {filteredFeedItems.map((item, idx) => (
+                  <View
+                    key={item.idea.id}
+                    style={{
+                      width: '32%', // 3 per row with gap
+                      marginBottom: 8,
+                      marginRight: (idx + 1) % 3 === 0 ? 0 : '2%',
+                    }}
+                  >
+                    <MiniIdeaCard
+                      item={item}
+                      onPress={() => setSelectedIdea(item)}
+                    />
+                  </View>
+                ))}
+              </View>
+            )
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Ionicons name="calendar-outline" size={64} color="#ccc" />
+              <Text style={styles.emptyTitle}>No events yet</Text>
+              <Text style={styles.emptySubtitle}>
+                Your events will appear here soon.
+              </Text>
             </View>
           )}
         </View>
@@ -593,20 +642,15 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   filterTag: {
-    backgroundColor: '#23242a',
+    backgroundColor: '#181a20',
     borderRadius: 20,
     paddingHorizontal: 18,
     paddingVertical: 9,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  filterTagUnselected: {
-    // borderWidth: 1,
-    // borderColor: '#23242a',
-  },
   filterTagSelected: {
-    // borderColor: '#555',
-    // borderWidth: 1,
+    backgroundColor: '#23242a',
   },
   filterTagText: {
     color: '#aaa',
@@ -615,9 +659,34 @@ const styles = StyleSheet.create({
   },
   filterTagTextSelected: {
     color: '#90e0ac',
+    fontWeight: '700',
   },
   filterTagContent: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  tabBarProfile: {
+    flexDirection: 'row',
+    backgroundColor: '#181a20',
+    borderRadius: 12,
+    marginBottom: 18,
+    overflow: 'hidden',
+  },
+  tabProfile: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+  },
+  tabProfileActive: {
+    backgroundColor: '#23242a',
+  },
+  tabProfileText: {
+    color: '#aaa',
+    fontWeight: '700',
+    fontSize: 16,
+  },
+  tabProfileTextActive: {
+    color: '#90e0ac',
   },
 }); 

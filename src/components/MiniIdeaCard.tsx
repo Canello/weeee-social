@@ -117,7 +117,7 @@ export const MiniIdeaCard: React.FC<MiniIdeaCardProps> = ({
 const styles = StyleSheet.create({
   container: {
     aspectRatio: 0.83, // ~5:6 ratio, similar to previous
-    borderRadius: 12,
+    borderRadius: 4,
     // marginHorizontal removed; parent should handle spacing
     overflow: 'hidden',
     shadowColor: '#000',

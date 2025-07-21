@@ -742,7 +742,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   tagTextSelected: {
-    color: '#333',//'#1e6b3a',
+    color: '#333',
     fontWeight: '700',
   },
   tagTextSelectedActive: {
