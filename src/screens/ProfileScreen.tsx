@@ -22,12 +22,48 @@ interface ProfileScreenProps {
   navigation: any;
 }
 
+interface ProfileFilterTagsProps {
+  selectedCreated: boolean;
+  setSelectedCreated: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedInterested: boolean;
+  setSelectedInterested: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+interface FilterTagProps {
+  label: string;
+  selected: boolean;
+  onPress: () => void;
+}
+
+const FilterTag: React.FC<FilterTagProps> = ({ label, selected, onPress }) => (
+  <TouchableOpacity
+    style={[
+      styles.filterTag,
+      !selected && styles.filterTagUnselected,
+      selected && styles.filterTagSelected,
+    ]}
+    onPress={onPress}
+    activeOpacity={0.7}
+  >
+    <View style={styles.filterTagContent}>
+      {selected ? (
+        <Ionicons name="checkmark" size={16} color="#90e0ac" style={{ marginRight: 4 }} />
+      ) : (
+        <Ionicons name="close" size={16} color="#aaa" style={{ marginRight: 4 }} />
+      )}
+      <Text style={[styles.filterTagText, selected && styles.filterTagTextSelected]}>{label}</Text>
+    </View>
+  </TouchableOpacity>
+);
+
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const currentUser = getCurrentUser();
 
   const [selectedIdea, setSelectedIdea] = useState<FeedItem | null>(null);
   const [bioExpanded, setBioExpanded] = useState(false);
   const [bioShouldCollapse, setBioShouldCollapse] = useState(false);
+  const [selectedCreated, setSelectedCreated] = useState(true);
+  const [selectedInterested, setSelectedInterested] = useState(true);
 
   const userIdeas = mockIdeas.filter(idea => idea.creatorId === currentUser.id);
   const userFeedItems: FeedItem[] = userIdeas.map(idea => ({
@@ -45,6 +81,24 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     interestCount: idea.interestedUsers.length,
     isInterested: true,
   }));
+
+  // Combine user ideas and interests, removing duplicates (by idea id)
+  const combinedFeedItems: FeedItem[] = [
+    ...userFeedItems,
+    ...interestedFeedItems.filter(
+      (item) => !userFeedItems.some((u) => u.idea.id === item.idea.id)
+    ),
+  ];
+
+  // Filter according to tag selection
+  let filteredFeedItems: FeedItem[] = [];
+  if (selectedCreated && selectedInterested) {
+    filteredFeedItems = combinedFeedItems;
+  } else if (selectedCreated) {
+    filteredFeedItems = userFeedItems;
+  } else if (selectedInterested) {
+    filteredFeedItems = interestedFeedItems;
+  } // else remains empty
 
   const handleInterest = (ideaId: string) => {
     // Handle interest logic
@@ -182,20 +236,60 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {renderHeader()}
-        
-        {renderCarousel(
-          userFeedItems,
-          'My Ideas',
-          renderEmptyIdeas(),
-          'ideas'
-        )}
-        
-        {renderCarousel(
-          interestedFeedItems,
-          'My Interests',
-          renderEmptyInterests(),
-          'interests'
-        )}
+        <View style={{ paddingHorizontal: 16, marginTop: 24 }}>
+          {/* Tag toggles styled like CreateEventScreen */}
+          <View style={styles.filterTagContainer}>
+            <FilterTag
+              label="Created by me"
+              selected={selectedCreated}
+              onPress={() => setSelectedCreated((prev: boolean) => !prev)}
+            />
+            <FilterTag
+              label="Interested"
+              selected={selectedInterested}
+              onPress={() => setSelectedInterested((prev: boolean) => !prev)}
+            />
+          </View>
+          {filteredFeedItems.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Ionicons name="bulb-outline" size={64} color="#ccc" />
+              <Text style={styles.emptyTitle}>No ideas or interests yet</Text>
+              <Text style={styles.emptySubtitle}>
+                Share your first idea or show interest in others!
+              </Text>
+              <TouchableOpacity
+                style={styles.createButton}
+                onPress={() => navigation.navigate('CreateIdea')}
+              >
+                <Text style={styles.createButtonText}>Create Idea</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.exploreButton, { marginTop: 12 }]}
+                onPress={() => navigation.navigate('Explore')}
+              >
+                <Text style={styles.exploreButtonText}>Explore Ideas</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
+              {filteredFeedItems.map((item, idx) => (
+                <View
+                  key={item.idea.id}
+                  style={{
+                    width: '31%', // 3 per row with small gaps
+                    marginBottom: 16,
+                    marginRight: (idx + 1) % 3 === 0 ? 0 : '3.5%',
+                  }}
+                >
+                  <MiniIdeaCard
+                    item={item}
+                    onPress={() => setSelectedIdea(item)}
+                  />
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
         <View style={styles.bottomSpacing} />
       </ScrollView>
       <Modal
@@ -491,5 +585,39 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     marginBottom: 0,
+  },
+  filterTagContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 16,
+    gap: 16,
+  },
+  filterTag: {
+    backgroundColor: '#23242a',
+    borderRadius: 20,
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  filterTagUnselected: {
+    // borderWidth: 1,
+    // borderColor: '#23242a',
+  },
+  filterTagSelected: {
+    // borderColor: '#555',
+    // borderWidth: 1,
+  },
+  filterTagText: {
+    color: '#aaa',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  filterTagTextSelected: {
+    color: '#90e0ac',
+  },
+  filterTagContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 }); 

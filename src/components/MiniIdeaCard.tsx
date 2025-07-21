@@ -17,8 +17,7 @@ interface MiniIdeaCardProps {
   onPress?: () => void;
 }
 
-const { width } = Dimensions.get('window');
-const cardWidth = (width - 48) / 2; // 2 cards per row with margins
+// Removed fixed cardWidth; parent should control width for responsiveness
 
 export const MiniIdeaCard: React.FC<MiniIdeaCardProps> = ({
   item,
@@ -62,9 +61,9 @@ export const MiniIdeaCard: React.FC<MiniIdeaCardProps> = ({
         style={styles.backgroundImage}
       />
       <LinearGradient
-        colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0)']}
+        colors={['rgba(0,0,0,0.6)', 'rgba(0,0,0,0)']}
         start={{ x: 0.5, y: 1 }}
-        end={{ x: 0.5, y: 0.6 }}
+        end={{ x: 0.5, y: 0.3 }}
         style={StyleSheet.absoluteFill}
       />
       <View style={styles.overlay}>
@@ -91,15 +90,20 @@ export const MiniIdeaCard: React.FC<MiniIdeaCardProps> = ({
                     style={[
                       styles.interestedAvatar,
                       idx > 0 && { marginLeft: -6 },
+                      idea.interestedUsers.length >= idea.minimumInterested && styles.interestedAvatarMet,
                     ]}
                   />
                 ))}
               </View>
-              <Text style={styles.interestedCount}>
+              <Text
+                style={[
+                  styles.interestedCount,
+                  idea.interestedUsers.length >= idea.minimumInterested && styles.interestedCountMet,
+                ]}
+              >
                 {idea.interestedUsers.length}
               </Text>
             </View>
-            
             {isInterested && (
               <Ionicons name="checkmark-circle" size={16} color="#2ed573" />
             )}
@@ -112,10 +116,9 @@ export const MiniIdeaCard: React.FC<MiniIdeaCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: cardWidth,
-    height: cardWidth * 1.2,
+    aspectRatio: 0.83, // ~5:6 ratio, similar to previous
     borderRadius: 12,
-    marginHorizontal: 8,
+    // marginHorizontal removed; parent should handle spacing
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: {
@@ -201,5 +204,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#fff',
     fontWeight: '500',
+  },
+  interestedAvatarMet: {
+    borderColor: '#4ed164', // green tone
+  },
+  interestedCountMet: {
+    color: '#4ed164', // green tone
   },
 }); 
