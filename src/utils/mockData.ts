@@ -1,4 +1,4 @@
-import { User, Idea, FeedItem } from '../types';
+import { User, Idea, FeedItem, Event } from '../types';
 
 export const mockUsers: User[] = [
   {
@@ -248,5 +248,43 @@ export const mockFeedItems: FeedItem[] = mockIdeas.map(idea => ({
   interestCount: idea.interestedUsers.length,
   isInterested: false,
 }));
+
+export const mockEvents: Event[] = [
+  {
+    id: '1',
+    title: 'Local Food Festival',
+    description: 'A community-driven food festival showcasing local restaurants and food trucks. We could have live music, cooking demonstrations, and food competitions.',
+    imageUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400',
+    startDate: new Date('2024-08-15T18:00:00'),
+    location: 'Central Park, New York',
+    creator: mockUsers[1],
+    admins: [mockUsers[1], mockUsers[0]],
+    invitees: [mockUsers[2], mockUsers[3]],
+    pendingInvitees: [mockUsers[4]],
+    attendees: [mockUsers[0], mockUsers[2], mockUsers[3]],
+    isPaid: true,
+    tickets: [
+      { name: 'General Admission', price: 25, quantity: 100 },
+      { name: 'VIP', price: 75, quantity: 10 },
+    ],
+    visibility: 'followers',
+  },
+  {
+    id: '2',
+    title: 'Urban Gardening Workshop',
+    description: 'Learn how to grow your own vegetables in small urban spaces. We\'ll cover container gardening, vertical farming, and sustainable practices.',
+    imageUrl: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400',
+    startDate: new Date('2024-08-20T14:00:00'),
+    location: 'Community Garden, Brooklyn',
+    creator: mockUsers[2],
+    admins: [mockUsers[2]],
+    invitees: [mockUsers[0], mockUsers[1]],
+    pendingInvitees: [],
+    attendees: [mockUsers[0], mockUsers[1], mockUsers[3], mockUsers[5]],
+    isPaid: false,
+    tickets: [],
+    visibility: 'invited',
+  },
+];
 
 export const getCurrentUser = (): User => mockUsers[0]; 

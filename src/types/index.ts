@@ -40,4 +40,25 @@ export interface FeedItem {
   idea: Idea;
   interestCount: number;
   isInterested: boolean;
+}
+
+export interface Event {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  startDate: Date;
+  location: string;
+  creator: User;
+  admins: User[];
+  invitees: User[];
+  pendingInvitees: User[];
+  attendees: User[];
+  isPaid: boolean;
+  tickets: {
+    name: string;
+    price: number;
+    quantity: number;
+  }[];
+  visibility: 'invited' | 'followers' | 'link' | 'nearby';
 } 
