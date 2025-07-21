@@ -156,7 +156,7 @@ function CreateEventScreen({ route, navigation }: { route: any; navigation: any 
       case 1:
         return (
           <View style={{ flex: 1, padding: 20 }}>
-            <Text style={[styles.stepLabel, { marginBottom: 4 }]}>Start Date & Time:</Text>
+            <Text style={styles.stepLabel}>Start Date & Time</Text>
             <TextInput
               style={styles.input}
               value={date}
@@ -165,7 +165,10 @@ function CreateEventScreen({ route, navigation }: { route: any; navigation: any 
               placeholderTextColor="#888"
             />
             <View style={[styles.inputGroup, { marginTop: 24 }]}>
-              <Text style={styles.label}>Who can see the event?</Text>
+              <Text style={styles.stepLabel}>Who can see the event?</Text>
+              <Text style={styles.explanationText}>
+                People who can see the event can ask to participate.
+              </Text>
               <View style={styles.tagContainer}>
                 {[
                   { key: 'invited', label: 'Invited people' },
@@ -221,7 +224,7 @@ function CreateEventScreen({ route, navigation }: { route: any; navigation: any 
             <View style={styles.paymentRow}>
               <Text style={styles.stepLabel}>Is paid?</Text>
             </View>
-            <Text style={styles.explanationText}>
+            <Text style={[styles.explanationText, styles.isPaidExplanationText]}>
               If enabled, you can sell tickets for your event. Invited people will need to buy a ticket when confirming participation.
             </Text>
             <View style={styles.paymentRow}>
@@ -708,7 +711,7 @@ const styles = StyleSheet.create({
   tagContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginTop: 8,
+    marginTop: 16,
     gap: 16,
   },
   tag: {
@@ -819,8 +822,10 @@ const styles = StyleSheet.create({
   explanationText: {
     color: '#888',
     fontSize: 13,
-    marginHorizontal: 20,
   },
+  isPaidExplanationText: {
+    marginHorizontal: 20,
+  }
 });
 
 export default CreateEventScreen; 
