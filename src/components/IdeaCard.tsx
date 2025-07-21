@@ -66,6 +66,7 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCreateEventModal, setShowCreateEventModal] = useState(false);
   const [showMinimumNotMetModal, setShowMinimumNotMetModal] = useState(false);
+  const [showRemoveInterestModal, setShowRemoveInterestModal] = useState(false);
 
   useEffect(() => {
     Animated.timing(animation, {
@@ -353,7 +354,13 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
             ) : (
             <TouchableOpacity
               style={[styles.confirmButton, isInterested && styles.confirmButtonActive]}
-              onPress={() => onInterest(idea.id)}
+              onPress={() => {
+                if (isInterested) {
+                  setShowRemoveInterestModal(true);
+                } else {
+                  onInterest(idea.id);
+                }
+              }}
             >
               {isInterested && (
                 <Ionicons
@@ -508,6 +515,31 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
                 }}
               >
                 <Text style={styles.modalButtonText}>Create</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
+      {/* Remove Interest Confirmation Modal */}
+      {showRemoveInterestModal && (
+        <View style={[StyleSheet.absoluteFill, { justifyContent: 'center', alignItems: 'center', zIndex: 2000 }]}> 
+          <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.85)' }} />
+          <View style={styles.modalContent}>
+            <View style={styles.modalTextContainer}>
+              <Text style={styles.modalTitle}>Remove Interest?</Text>
+              <Text style={styles.modalMessage}>
+                Are you sure you want to remove your interest from this idea?
+              </Text>
+            </View>
+            <View style={styles.modalActions}>
+              <TouchableOpacity style={styles.modalButton} onPress={() => setShowRemoveInterestModal(false)}>
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.modalButton, styles.modalButtonDanger]} onPress={() => { 
+                setShowRemoveInterestModal(false); 
+                onInterest(idea.id);
+              }}>
+                <Text style={[styles.modalButtonText, styles.modalButtonDangerText]}>Remove</Text>
               </TouchableOpacity>
             </View>
           </View>
