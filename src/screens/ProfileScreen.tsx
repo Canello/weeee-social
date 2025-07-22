@@ -39,9 +39,9 @@ const FilterTag: React.FC<FilterTagProps> = ({ label, selected, onPress }) => (
   >
     <View style={styles.filterTagContent}>
       {selected ? (
-        <Ionicons name="checkmark" size={16} color="#90e0ac" style={{ marginRight: 4 }} />
+        <Ionicons name="checkmark" size={16} color="#e6f0fa" style={{ marginRight: 4 }} />
       ) : (
-        <Ionicons name="close" size={16} color="#aaa" style={{ marginRight: 4 }} />
+        <Ionicons name="close" size={16} color="#848a96" style={{ marginRight: 4 }} />
       )}
       <Text style={[styles.filterTagText, selected && styles.filterTagTextSelected]}>{label}</Text>
     </View>
@@ -235,7 +235,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {renderHeader()}
-        <View style={{ paddingHorizontal: 16, marginTop: 24 }}>
+        <View style={styles.tabBarContainer}>
           {/* Tab bar */}
           <View style={styles.tabBarProfile}>
             <TouchableOpacity
@@ -311,7 +311,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                 </TouchableOpacity>
               </View>
             ) : (
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start', paddingHorizontal: 8 }}>
                 {filteredFeedItems.map((item, idx) => (
                   <View
                     key={item.idea.id}
@@ -339,7 +339,6 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             </View>
           )}
         </View>
-        <View style={styles.bottomSpacing} />
       </ScrollView>
       <Modal
         visible={!!selectedIdea}
@@ -534,9 +533,6 @@ const styles = StyleSheet.create({
     marginLeft: 0,
     marginRight: 0,
   },
-  bottomSpacing: {
-    height: 32,
-  },
   overlayModal: {
     flex: 1,
     backgroundColor: 'transparent',
@@ -638,55 +634,65 @@ const styles = StyleSheet.create({
   filterTagContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    paddingHorizontal: 10,
     marginBottom: 16,
-    gap: 16,
+    gap: 12,
   },
   filterTag: {
-    backgroundColor: '#181a20',
     borderRadius: 20,
     paddingHorizontal: 18,
     paddingVertical: 9,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#383c45',
   },
   filterTagSelected: {
-    backgroundColor: '#23242a',
+    backgroundColor: '#383c45',
   },
   filterTagText: {
-    color: '#aaa',
+    color: '#848a96',
     fontSize: 14,
     fontWeight: '600',
   },
   filterTagTextSelected: {
-    color: '#90e0ac',
+    color: '#e6f0fa',
     fontWeight: '700',
   },
   filterTagContent: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  tabBarContainer: {
+    paddingHorizontal: 0,
+    marginTop: 48,
+    backgroundColor: '#181a20',
+    paddingBottom: 32,
+    overflow: 'hidden',
+  },
   tabBarProfile: {
     flexDirection: 'row',
-    backgroundColor: '#181a20',
-    borderRadius: 12,
+    backgroundColor: '#111216',
     marginBottom: 18,
     overflow: 'hidden',
   },
   tabProfile: {
     flex: 1,
-    paddingVertical: 12,
+    paddingTop: 16,
+    paddingBottom: 12,
     alignItems: 'center',
     backgroundColor: 'transparent',
   },
   tabProfileActive: {
-    backgroundColor: '#23242a',
+    backgroundColor: '#181a20',
+    borderTopWidth: 1,
+    borderTopColor: '#e6f0fa',
   },
   tabProfileText: {
-    color: '#aaa',
+    color: '#777',
     fontWeight: '700',
-    fontSize: 16,
   },
   tabProfileTextActive: {
-    color: '#90e0ac',
+    color: '#e6f0fa',
   },
 }); 
