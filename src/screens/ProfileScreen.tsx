@@ -13,9 +13,10 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MiniIdeaCard } from '../components/MiniIdeaCard';
+import { MiniEventCard } from '../components/MiniEventCard';
 import { IdeaCard } from '../components/IdeaCard';
-import { User, FeedItem } from '../types';
-import { getCurrentUser, mockIdeas } from '../utils/mockData';
+import { User, FeedItem, Event } from '../types';
+import { getCurrentUser, mockIdeas, mockEvents } from '../utils/mockData';
 import { BlurView } from 'expo-blur';
 
 interface ProfileScreenProps {
@@ -52,6 +53,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const currentUser = getCurrentUser();
 
   const [selectedIdea, setSelectedIdea] = useState<FeedItem | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [bioExpanded, setBioExpanded] = useState(false);
   const [bioShouldCollapse, setBioShouldCollapse] = useState(false);
   const [selectedCreated, setSelectedCreated] = useState(true);
@@ -99,6 +101,31 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     filteredFeedItems = interestedFeedItems;
   } // else remains empty
 
+  // Event data filtering
+  const userEvents = mockEvents.filter(event => 
+    event.creator.id === currentUser.id || 
+    event.admins.some(admin => admin.id === currentUser.id)
+  );
+  
+  const invitedEvents = mockEvents.filter(event => 
+    event.invitees.some(invitee => invitee.id === currentUser.id) ||
+    event.pendingInvitees.some(invitee => invitee.id === currentUser.id)
+  );
+  
+  const attendingEvents = mockEvents.filter(event => 
+    event.attendees.some(attendee => attendee.id === currentUser.id)
+  );
+
+  // Filter events according to tag selection
+  let filteredEvents: Event[] = [];
+  if (selectedInvited && selectedAttendee && selectedAdmin) {
+    filteredEvents = [...new Set([...userEvents, ...invitedEvents, ...attendingEvents])];
+  } else {
+    if (selectedAdmin) filteredEvents.push(...userEvents);
+    if (selectedAttendee) filteredEvents.push(...attendingEvents);
+    if (selectedInvited) filteredEvents.push(...invitedEvents);
+  }
+
   const handleInterest = (ideaId: string) => {
     // Handle interest logic
   };
@@ -107,6 +134,11 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     const source = from === 'ideas' ? userFeedItems : interestedFeedItems;
     const found = source.find(item => item.idea.id === ideaId);
     if (found) setSelectedIdea(found);
+  };
+
+  const handleEventPress = (eventId: string) => {
+    const found = filteredEvents.find(event => event.id === eventId);
+    if (found) setSelectedEvent(found);
   };
 
   const renderHeader = () => (
@@ -242,13 +274,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               style={[styles.tabProfile, activeTab === 'ideas' && styles.tabProfileActive]}
               onPress={() => setActiveTab('ideas')}
             >
-              <Text style={[styles.tabProfileText, activeTab === 'ideas' && styles.tabProfileTextActive]}>My Ideas</Text>
+              <Text style={[styles.tabProfileText, activeTab === 'ideas' && styles.tabProfileTextActive]}>My ideas</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.tabProfile, activeTab === 'events' && styles.tabProfileActive]}
               onPress={() => setActiveTab('events')}
             >
-              <Text style={[styles.tabProfileText, activeTab === 'events' && styles.tabProfileTextActive]}>My Events</Text>
+              <Text style={[styles.tabProfileText, activeTab === 'events' && styles.tabProfileTextActive]}>My events</Text>
             </TouchableOpacity>
           </View>
 
@@ -330,13 +362,34 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               </View>
             )
           ) : (
-            <View style={styles.emptyContainer}>
-              <Ionicons name="calendar-outline" size={64} color="#ccc" />
-              <Text style={styles.emptyTitle}>No events yet</Text>
-              <Text style={styles.emptySubtitle}>
-                Your events will appear here soon.
-              </Text>
-            </View>
+            filteredEvents.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Ionicons name="calendar-outline" size={64} color="#ccc" />
+                <Text style={styles.emptyTitle}>No events yet</Text>
+                <Text style={styles.emptySubtitle}>
+                  Your events will appear here soon.
+                </Text>
+              </View>
+            ) : (
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start', paddingHorizontal: 8 }}>
+                {filteredEvents.map((event, idx) => (
+                  <View
+                    key={event.id}
+                    style={{
+                      width: '32%', // 3 per row with gap
+                      marginBottom: 8,
+                      marginRight: (idx + 1) % 3 === 0 ? 0 : '2%',
+                    }}
+                  >
+                    <MiniEventCard
+                      event={event}
+                      currentUserId={currentUser.id}
+                      onPress={() => handleEventPress(event.id)}
+                    />
+                  </View>
+                ))}
+              </View>
+            )
           )}
         </View>
       </ScrollView>
