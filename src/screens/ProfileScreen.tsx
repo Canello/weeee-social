@@ -679,7 +679,7 @@ const styles = StyleSheet.create({
   tabProfile: {
     flex: 1,
     paddingTop: 16,
-    paddingBottom: 12,
+    paddingBottom: 16,
     alignItems: 'center',
     backgroundColor: 'transparent',
   },
@@ -689,7 +689,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#e6f0fa',
   },
   tabProfileText: {
-    color: '#777',
+    color: '#aaa',
     fontWeight: '700',
   },
   tabProfileTextActive: {

@@ -23,6 +23,32 @@ interface UserProfileScreenProps {
   route: any;
 }
 
+interface FilterTagProps {
+  label: string;
+  selected: boolean;
+  onPress: () => void;
+}
+
+const FilterTag: React.FC<FilterTagProps> = ({ label, selected, onPress }) => (
+  <TouchableOpacity
+    style={[
+      styles.filterTag,
+      selected && styles.filterTagSelected
+    ]}
+    onPress={onPress}
+    activeOpacity={0.7}
+  >
+    <View style={styles.filterTagContent}>
+      {selected ? (
+        <Ionicons name="checkmark" size={16} color="#e6f0fa" style={{ marginRight: 4 }} />
+      ) : (
+        <Ionicons name="close" size={16} color="#848a96" style={{ marginRight: 4 }} />
+      )}
+      <Text style={[styles.filterTagText, selected && styles.filterTagTextSelected]}>{label}</Text>
+    </View>
+  </TouchableOpacity>
+);
+
 export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ navigation, route }) => {
   const userId = route.params?.userId;
   const currentUser = getCurrentUser();
@@ -31,6 +57,13 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ navigation
   const [selectedIdea, setSelectedIdea] = useState<FeedItem | null>(null);
   const [bioExpanded, setBioExpanded] = useState(false);
   const [bioShouldCollapse, setBioShouldCollapse] = useState(false);
+  const [activeTab, setActiveTab] = useState<'ideas' | 'events'>('ideas');
+
+  // Event tab tag states
+  const [selectedInvited, setSelectedInvited] = useState(true);
+  const [selectedAttendee, setSelectedAttendee] = useState(true);
+  const [selectedAdmin, setSelectedAdmin] = useState(true);
+  const [selectedPast, setSelectedPast] = useState(false);
 
   // If user not found, show error or redirect
   if (!profileUser) {
@@ -74,6 +107,26 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ navigation
     const found = userFeedItems.find(item => item.idea.id === ideaId);
     if (found) setSelectedIdea(found);
   };
+
+  const renderEmptyIdeas = () => (
+    <View style={styles.emptyContainer}>
+      <Ionicons name="bulb-outline" size={64} color="#ccc" />
+      <Text style={styles.emptyTitle}>No ideas yet</Text>
+      <Text style={styles.emptySubtitle}>
+        This user hasn't shared any ideas yet
+      </Text>
+    </View>
+  );
+
+  const renderEmptyEvents = () => (
+    <View style={styles.emptyContainer}>
+      <Ionicons name="calendar-outline" size={64} color="#ccc" />
+      <Text style={styles.emptyTitle}>No events yet</Text>
+      <Text style={styles.emptySubtitle}>
+        This user hasn't created any events yet.
+      </Text>
+    </View>
+  );
 
   const renderHeader = () => (
     <View style={styles.background}>
@@ -164,52 +217,59 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ navigation
     </View>
   );
 
-  const renderCarousel = (items: FeedItem[], title: string, emptyComponent: React.ReactNode) => (
-    <View style={styles.carouselSection}>
-      <Text style={styles.carouselTitle}>{title}</Text>
-      {items.length > 0 ? (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.carouselContentNoPad}
-        >
-          {items.map((item, idx) => (
-            <View key={item.idea.id} style={idx === 0 ? { paddingLeft: 16 } : undefined}>
-              <MiniIdeaCard
-                item={item}
-                onPress={() => handleIdeaPress(item.idea.id)}
-              />
-            </View>
-          ))}
-        </ScrollView>
-      ) : (
-        emptyComponent
-      )}
-    </View>
-  );
-
-  const renderEmptyIdeas = () => (
-    <View style={styles.emptyContainer}>
-      <Ionicons name="bulb-outline" size={64} color="#ccc" />
-      <Text style={styles.emptyTitle}>No ideas yet</Text>
-      <Text style={styles.emptySubtitle}>
-        This user hasn't shared any ideas yet
-      </Text>
-    </View>
-  );
-
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {renderHeader()}
-        
-        {renderCarousel(
-          userFeedItems,
-          'Ideas',
-          renderEmptyIdeas()
-        )}
-        
-        <View style={styles.bottomSpacing} />
+        <View style={styles.tabBarContainer}>
+          {/* Tab bar */}
+          <View style={styles.tabBarProfile}>
+            <TouchableOpacity
+              style={[styles.tabProfile, activeTab === 'ideas' && styles.tabProfileActive]}
+              onPress={() => setActiveTab('ideas')}
+            >
+              <Text style={[styles.tabProfileText, activeTab === 'ideas' && styles.tabProfileTextActive]}>Ideas</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tabProfile, activeTab === 'events' && styles.tabProfileActive]}
+              onPress={() => setActiveTab('events')}
+            >
+              <Text style={[styles.tabProfileText, activeTab === 'events' && styles.tabProfileTextActive]}>Events</Text>
+            </TouchableOpacity>
+          </View>
+
+          {activeTab === 'ideas' ? (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start', paddingHorizontal: 8 }}>
+              {userFeedItems.length > 0 ? (
+                userFeedItems.map((item, idx) => (
+                  <View
+                    key={item.idea.id}
+                    style={{
+                      width: '32%', // 3 per row with gap
+                      marginBottom: 8,
+                      marginRight: (idx + 1) % 3 === 0 ? 0 : '2%',
+                    }}
+                  >
+                    <MiniIdeaCard
+                      item={item}
+                      onPress={() => setSelectedIdea(item)}
+                    />
+                  </View>
+                ))
+              ) : (
+                renderEmptyIdeas()
+              )}
+            </View>
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Ionicons name="calendar-outline" size={64} color="#ccc" />
+              <Text style={styles.emptyTitle}>No events yet</Text>
+              <Text style={styles.emptySubtitle}>
+                This user hasn't created any events yet.
+              </Text>
+            </View>
+          )}
+        </View>
       </ScrollView>
       <Modal
         visible={!!selectedIdea}
@@ -507,5 +567,69 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     marginBottom: 0,
+  },
+  filterTagContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 10,
+    marginBottom: 16,
+    gap: 12,
+  },
+  filterTag: {
+    borderRadius: 20,
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#383c45',
+  },
+  filterTagSelected: {
+    backgroundColor: '#383c45',
+  },
+  filterTagText: {
+    color: '#848a96',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  filterTagTextSelected: {
+    color: '#e6f0fa',
+    fontWeight: '700',
+  },
+  filterTagContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  tabBarContainer: {
+    paddingHorizontal: 0,
+    marginTop: 48,
+    backgroundColor: '#181a20',
+    paddingBottom: 32,
+    overflow: 'hidden',
+  },
+  tabBarProfile: {
+    flexDirection: 'row',
+    backgroundColor: '#111216',
+    marginBottom: 18,
+    overflow: 'hidden',
+  },
+  tabProfile: {
+    flex: 1,
+    paddingTop: 16,
+    paddingBottom: 16,
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+  },
+  tabProfileActive: {
+    backgroundColor: '#181a20',
+    borderTopWidth: 1,
+    borderTopColor: '#e6f0fa',
+  },
+  tabProfileText: {
+    color: '#aaa',
+    fontWeight: '700',
+  },
+  tabProfileTextActive: {
+    color: '#e6f0fa',
   },
 }); 
