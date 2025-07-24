@@ -138,7 +138,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   const handleEventPress = (eventId: string) => {
     const found = filteredEvents.find(event => event.id === eventId);
-    if (found) setSelectedEvent(found);
+    if (found) {
+      navigation.navigate('Event', { event: found });
+    }
   };
 
   const renderHeader = () => (
