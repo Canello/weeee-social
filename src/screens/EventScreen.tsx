@@ -30,12 +30,54 @@ interface ChatMessage {
   timestamp: Date;
 }
 
+interface ChatMessageProps {
+  message: ChatMessage;
+}
+
+const ChatMessageComponent: React.FC<ChatMessageProps> = ({ message }) => {
+  const [expanded, setExpanded] = useState(false);
+  const [shouldShowSeeMore, setShouldShowSeeMore] = useState(false);
+  
+  return (
+    <View style={styles.messageContainer}>
+      <View style={styles.messageBubble}>
+        <View style={styles.messageHeader}>
+          <Image source={{ uri: message.admin.avatar }} style={styles.messageAvatar} />
+          <Text style={styles.messageAuthor}>{message.admin.displayName}</Text>
+          <Text style={styles.messageTime}>
+            {dayjs(message.timestamp).format('h:mm A')}
+          </Text>
+        </View>
+        <Text
+          style={styles.messageText}
+          numberOfLines={expanded ? undefined : 10}
+          onTextLayout={e => {
+            if (!expanded && e.nativeEvent.lines.length > 10) {
+              setShouldShowSeeMore(true);
+            }
+          }}
+        >
+          {message.text}
+        </Text>
+        {shouldShowSeeMore && (
+          <TouchableOpacity
+            style={styles.seeMoreButton}
+            onPress={() => setExpanded(!expanded)}
+          >
+            <Text style={styles.seeMoreText}>
+              {expanded ? 'See less' : 'See more'}
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
+};
+
 export const EventScreen: React.FC<EventScreenProps> = ({ navigation, route }) => {
   const event: Event = route.params?.event;
   const currentUser = getCurrentUser();
   
-  const [bioExpanded, setBioExpanded] = useState(false);
-  const [bioShouldCollapse, setBioShouldCollapse] = useState(false);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [descriptionShouldCollapse, setDescriptionShouldCollapse] = useState(false);
   const [newMessage, setNewMessage] = useState('');
@@ -144,26 +186,26 @@ export const EventScreen: React.FC<EventScreenProps> = ({ navigation, route }) =
       <Image source={{ uri: event.imageUrl }} style={styles.headerImage} />
       <LinearGradient
         colors={['rgba(17, 18, 22, 0.3)', '#111216']}
-        style={styles.gradientOverlay}
+        style={[styles.gradientOverlay, descriptionExpanded && styles.gradientOverlayExpanded]}
       />
-      <View style={styles.headerContent}>
-        <View style={styles.headerTop}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={handleBack}
-          >
-            <Ionicons name="arrow-back" size={24} color="#fff" />
+      <View style={styles.headerTop}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={handleBack}
+        >
+          <Ionicons name="arrow-back" size={24} color="#fff" />
+        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity style={styles.headerActionButton} onPress={handleShare}>
+            <Ionicons name="arrow-redo-outline" size={24} color="#fff" />
           </TouchableOpacity>
-          <View style={styles.headerActions}>
-            <TouchableOpacity style={styles.headerActionButton} onPress={handleShare}>
-              <Ionicons name="arrow-redo-outline" size={24} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.headerActionButton} onPress={handleMoreOptions}>
-              <Ionicons name="ellipsis-vertical" size={20} color="#fff" />
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity style={styles.headerActionButton} onPress={handleMoreOptions}>
+            <Ionicons name="ellipsis-vertical" size={20} color="#fff" />
+          </TouchableOpacity>
         </View>
-        
+      </View>
+
+      <View style={[styles.headerContent, descriptionExpanded && styles.headerContentExpanded]}>
         <View style={styles.eventInfo}>
           <Text style={styles.eventTitle}>{event.title}</Text>
           <Text style={styles.eventDateTime}>{formatDateTime(event.startDate)}</Text>
@@ -184,7 +226,7 @@ export const EventScreen: React.FC<EventScreenProps> = ({ navigation, route }) =
             <Text style={styles.attendeesText}>
               {event.attendees.length} attendees | {event.invitees.length + event.pendingInvitees.length} invited
             </Text>
-            <Ionicons name="chevron-forward" size={16} color="#ddd" />
+            <Ionicons name="chevron-forward" size={16} color="#eee" />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -204,7 +246,7 @@ export const EventScreen: React.FC<EventScreenProps> = ({ navigation, route }) =
 
           <Text
             style={styles.eventDescription}
-            numberOfLines={descriptionExpanded ? undefined : 3}
+            numberOfLines={descriptionExpanded ? undefined : 2}
             ellipsizeMode="tail"
             onTextLayout={e => {
               if (!descriptionShouldCollapse && e.nativeEvent.lines.length > 3) {
@@ -214,10 +256,10 @@ export const EventScreen: React.FC<EventScreenProps> = ({ navigation, route }) =
           >
             {event.description || 'No description available'}
           </Text>
-          <TouchableOpacity
-            style={styles.eventSeeMoreButton}
-            onPress={() => setDescriptionExpanded(exp => !exp)}
-          >
+                  <TouchableOpacity
+                    style={styles.eventSeeMoreButton}
+                    onPress={() => setDescriptionExpanded(exp => !exp)}
+                  >
             <Text style={styles.eventSeeMoreText}>
               {descriptionExpanded ? 'See less' : 'See more'}
             </Text>
@@ -227,51 +269,10 @@ export const EventScreen: React.FC<EventScreenProps> = ({ navigation, route }) =
     </View>
   );
 
-  const renderChatMessage = (message: ChatMessage) => {
-    const [expanded, setExpanded] = useState(false);
-    const [shouldShowSeeMore, setShouldShowSeeMore] = useState(false);
-    
-    return (
-      <View key={message.id} style={styles.messageContainer}>
-        <View style={styles.messageBubble}>
-          <View style={styles.messageHeader}>
-            <Image source={{ uri: message.admin.avatar }} style={styles.messageAvatar} />
-            <Text style={styles.messageAuthor}>{message.admin.displayName}</Text>
-            <Text style={styles.messageTime}>
-              {dayjs(message.timestamp).format('h:mm A')}
-            </Text>
-          </View>
-          <Text
-            style={styles.messageText}
-            numberOfLines={expanded ? undefined : 10}
-            onTextLayout={e => {
-              if (!expanded && e.nativeEvent.lines.length > 10) {
-                setShouldShowSeeMore(true);
-              }
-            }}
-          >
-            {message.text}
-          </Text>
-          {shouldShowSeeMore && (
-            <TouchableOpacity
-              style={styles.seeMoreButton}
-              onPress={() => setExpanded(!expanded)}
-            >
-              <Text style={styles.seeMoreText}>
-                {expanded ? 'See less' : 'See more'}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
-    );
-  };
-
   const renderChat = () => (
     <View style={styles.chatSection}>
-      <Text style={styles.chatTitle}>Event updates</Text>
       <ScrollView style={styles.chatContainer} showsVerticalScrollIndicator={false}>
-        {chatMessages.map(renderChatMessage)}
+        {chatMessages.map(message => <ChatMessageComponent key={message.id} message={message} />)}
       </ScrollView>
       {isAdmin && (
         <View style={styles.messageInputContainer}>
@@ -309,7 +310,7 @@ export const EventScreen: React.FC<EventScreenProps> = ({ navigation, route }) =
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         {renderHeader()}
-        {renderChat()}
+        {!descriptionExpanded && renderChat()}
       </KeyboardAvoidingView>
       
       {/* Remove Attendance Confirmation Modal */}
@@ -373,8 +374,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   header: {
-    height: Dimensions.get('window').height * 0.4,
+    height: '42%',
     position: 'relative',
+  },
+  headerExpanded: {
+    height: '100%',
   },
   headerImage: {
     width: '100%',
@@ -384,9 +388,25 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     zIndex: 1,
   },
-  headerContent: {
+  gradientOverlayExpanded: {
+    display: 'none',
+  },
+  headerTop: {
     position: 'absolute',
     top: 0,
+    left: 0,
+    right: 0,
+    height: 64,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    zIndex: 3,
+  },
+  headerContent: {
+    position: 'absolute',
+    top: 64,
     left: 0,
     right: 0,
     bottom: 0,
@@ -394,11 +414,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
   },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
+  headerContentExpanded: {
+    position: 'relative',
+    top: 0,
   },
   headerActions: {
     flexDirection: 'row',
@@ -425,7 +443,7 @@ const styles = StyleSheet.create({
   eventDateTime: {
     fontSize: 14,
     color: '#ddd',
-    marginBottom: 12,
+    marginBottom: 6,
   },
   attendeesSection: {
     flexDirection: 'row',
@@ -447,7 +465,7 @@ const styles = StyleSheet.create({
   attendeesText: {
     flex: 1,
     fontSize: 14,
-    color: '#ddd',
+    color: '#eee',
     fontWeight: '500',
   },
   attendButton: {
@@ -483,6 +501,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   eventSeeMoreText: {
+    textAlign: 'center',
     color: '#ebebeb',
     fontSize: 14,
     fontWeight: '800',
@@ -494,13 +513,7 @@ const styles = StyleSheet.create({
   chatSection: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 20,
-  },
-  chatTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 16,
+    paddingTop: 10,
   },
   chatContainer: {
     flex: 1,

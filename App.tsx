@@ -17,6 +17,7 @@ import { FollowersListScreen } from './src/screens/FollowersListScreen';
 import { InterestedPeopleScreen } from './src/screens/InterestedPeopleScreen';
 import CreateEventScreen from './src/screens/CreateEventScreen';
 import { EventScreen } from './src/screens/EventScreen';
+import { NotificationsScreen } from './src/screens/NotificationsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -37,6 +38,8 @@ function TabNavigator({ navigation }: any) {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Search') {
             iconName = focused ? 'search' : 'search-outline';
+          } else if (route.name === 'Notifications') {
+            iconName = focused ? 'notifications' : 'notifications-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
           } else {
@@ -52,12 +55,16 @@ function TabNavigator({ navigation }: any) {
           borderTopWidth: 1,
           borderTopColor: '#23242a',
           paddingBottom: Math.max(insets.bottom, 5),
-          paddingTop: 5,
-          height: 60 + Math.max(insets.bottom, 5),
+          paddingTop: 12,
+          paddingHorizontal: 20,
+          height: 50 + Math.max(insets.bottom, 5),
         },
+        tabBarShowLabel: false,
         headerShown: false,
       })}
     >
+      <Tab.Screen name="Feed" component={FeedScreen} />
+      <Tab.Screen name="Notifications" component={NotificationsScreen} />
       <Tab.Screen
         name="CreateIdeaTab"
         component={FeedScreen}
@@ -80,7 +87,6 @@ function TabNavigator({ navigation }: any) {
           },
         }}
       />
-      <Tab.Screen name="Feed" component={FeedScreen} />
       <Tab.Screen name="Search" component={ExploreScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>

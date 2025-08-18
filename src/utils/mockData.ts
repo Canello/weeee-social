@@ -253,7 +253,42 @@ export const mockEvents: Event[] = [
   {
     id: '1',
     title: 'Local Food Festival',
-    description: 'A community-driven food festival showcasing local restaurants and food trucks. We could have live music, cooking demonstrations, and food competitions.',
+    description: `Get ready for the most exciting culinary celebration of the year! Our Local Food Festival is a community-driven extravaganza that brings together the very best of our city's vibrant food scene. This isn't just another food event – it's a full sensory experience that celebrates local culture, creativity, and community spirit.
+
+What to Expect:
+🎵 Live Music & Entertainment
+Throughout the day, enjoy performances from local bands, acoustic sets, and cultural music that perfectly complements the culinary experience. Our main stage will feature everything from jazz ensembles to indie rock bands, creating the perfect ambiance for your food journey.
+
+🍳 Interactive Cooking Demonstrations
+Watch master chefs from our top local restaurants showcase their signature dishes live! Learn the secrets behind their most popular recipes, get cooking tips, and even participate in some hands-on cooking sessions. From traditional techniques to modern culinary innovations, there's something for every skill level.
+
+🏆 Food Competitions & Challenges
+Witness the excitement of our "Iron Chef" style competitions where local chefs battle it out in real-time cooking challenges. Categories include "Best Street Food," "Most Creative Fusion Dish," and "People's Choice Award." The energy is electric, and the creativity is off the charts!
+
+🍕 Food Trucks & Local Restaurants
+Over 50 local food vendors will be serving up their finest dishes. From gourmet food trucks to established restaurant pop-ups, you'll find everything from artisanal pizzas and gourmet burgers to authentic ethnic cuisine, vegan delights, and decadent desserts. Each vendor has been carefully selected to represent the diversity and quality of our local food scene.
+
+🍷 Craft Beer & Wine Garden
+Our dedicated beverage area features local craft breweries, wineries, and artisanal cocktail makers. Sample unique brews, discover new favorite wines, and enjoy expertly crafted cocktails made with local ingredients. Perfect for pairing with your food discoveries!
+
+👨‍👩‍👧‍👦 Family-Friendly Activities
+We haven't forgotten about the little foodies! Kids can enjoy cooking workshops, face painting, food-themed games, and special children's menus. There's even a "Junior Chef" competition where kids can show off their budding culinary skills.
+
+🌱 Sustainability Focus
+This festival is committed to environmental responsibility. We use compostable servingware, encourage recycling, and partner with local farms for fresh ingredients. Learn about sustainable food practices and how to make eco-friendly choices in your daily cooking.
+
+📸 Photo Opportunities
+Capture your food journey with our Instagram-worthy photo spots, food art installations, and interactive displays. Share your experience with #LocalFoodFest2024 and connect with fellow food enthusiasts.
+
+🎁 Special Features:
+- VIP Experience: Exclusive access to premium food tastings, private cooking demonstrations, and meet-and-greets with celebrity chefs
+- Food Tours: Guided tours of the festival with behind-the-scenes access to food preparation areas
+- Recipe Exchange: Bring your favorite family recipe to share and discover new ones from other attendees
+- Local Artisan Market: Browse and purchase locally made food products, cookware, and culinary accessories
+
+This festival is more than just eating – it's about celebrating our community's rich culinary heritage, supporting local businesses, and creating lasting memories with friends and family. Whether you're a foodie, a casual diner, or just looking for a fun day out, there's something here for everyone.
+
+Come hungry, leave inspired! Join us for a day of delicious discoveries, cultural celebration, and community connection. This is the food event of the year that you won't want to miss!`,
     imageUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400',
     startDate: new Date('2024-08-15T18:00:00'),
     location: 'Central Park, New York',

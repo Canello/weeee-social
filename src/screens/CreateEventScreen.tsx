@@ -174,7 +174,7 @@ function CreateEventScreen({ route, navigation }: { route: any; navigation: any 
                   { key: 'invited', label: 'Invited people' },
                   { key: 'followers', label: 'Followers' },
                   { key: 'link', label: 'Anyone with link' },
-                  { key: 'nearby', label: 'People nearby' },
+                  // { key: 'nearby', label: 'People nearby' },
                 ].map(option => {
                   const selected = visibility.includes(option.key);
                   const isInvited = option.key === 'invited';
