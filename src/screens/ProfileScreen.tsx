@@ -14,10 +14,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MiniIdeaCard } from '../components/MiniIdeaCard';
 import { MiniEventCard } from '../components/MiniEventCard';
-import { IdeaCard } from '../components/IdeaCard';
 import { User, FeedItem, Event } from '../types';
 import { getCurrentUser, mockIdeas, mockEvents } from '../utils/mockData';
 import { BlurView } from 'expo-blur';
+import { IdeaDetailCard } from '../components/IdeaDetailCard';
 
 interface ProfileScreenProps {
   navigation: any;
@@ -414,7 +414,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           </TouchableWithoutFeedback>
           <View style={styles.overlayCardContainer}>
             {selectedIdea && (
-              <IdeaCard
+              <IdeaDetailCard
                 item={selectedIdea}
                 onInterest={handleInterest}
                 navigation={navigation}

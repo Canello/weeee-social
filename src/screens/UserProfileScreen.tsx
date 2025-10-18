@@ -13,7 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MiniIdeaCard } from '../components/MiniIdeaCard';
-import { IdeaCard } from '../components/IdeaCard';
+import { IdeaDetailCard } from '../components/IdeaDetailCard';
 import { User, FeedItem } from '../types';
 import { getCurrentUser, mockIdeas, mockUsers } from '../utils/mockData';
 import { BlurView } from 'expo-blur';
@@ -290,7 +290,7 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ navigation
           </TouchableWithoutFeedback>
           <View style={styles.overlayCardContainer}>
             {selectedIdea && (
-              <IdeaCard
+              <IdeaDetailCard
                 item={selectedIdea}
                 onInterest={handleInterest}
                 navigation={navigation}

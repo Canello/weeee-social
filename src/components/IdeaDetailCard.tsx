@@ -51,7 +51,7 @@ function serializeIdeaForNavigation(feedItem: FeedItem) {
   };
 }
 
-export const IdeaCard: React.FC<IdeaCardProps> = ({
+export const IdeaDetailCard: React.FC<IdeaCardProps> = ({
   item,
   onInterest,
   navigation,
