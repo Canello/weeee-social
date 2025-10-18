@@ -58,8 +58,6 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
 }) => {
   const { idea, interestCount, isInterested } = item;
   const [expanded, setExpanded] = useState(false);
-  const animation = useRef(new Animated.Value(0)).current;
-  const contentHeight = useRef(0);
   const [menuVisible, setMenuVisible] = useState(false);
   const [menuPosition, setMenuPosition] = useState<{x: number, y: number}>({x: 0, y: 0});
   const threeDotsRef = useRef<ViewType | null>(null);
@@ -67,34 +65,6 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
   const [showCreateEventModal, setShowCreateEventModal] = useState(false);
   const [showMinimumNotMetModal, setShowMinimumNotMetModal] = useState(false);
   const [showRemoveInterestModal, setShowRemoveInterestModal] = useState(false);
-
-  useEffect(() => {
-    Animated.timing(animation, {
-      toValue: expanded ? 1 : 0,
-      duration: 250,
-      useNativeDriver: false,
-    }).start();
-  }, [expanded]);
-
-  const handleLayout = (event: any) => {
-    if (expanded && event.nativeEvent.layout.height > 0) {
-      contentHeight.current = event.nativeEvent.layout.height;
-    }
-  };
-
-  const collapsedHeight = 44; // Approximate height for 2 lines
-  const animatedHeight = animation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [collapsedHeight, contentHeight.current || 200],
-  });
-  const animatedOpacity = animation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.7, 1],
-  });
-
-  const toggleExpanded = () => {
-    setExpanded(!expanded);
-  };
 
   const handleUserPress = () => {
     if (navigation) {
@@ -160,16 +130,24 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
         source={{ uri: idea.imageUrl || 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400' }} 
         style={styles.backgroundImage}
       />
-      <View style={[styles.overlay, expanded && styles.overlayExpanded]}>
-        {!expanded && (
-          <LinearGradient
-            colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0)']}
-            start={{ x: 0.5, y: 1 }}
-            end={{ x: 0.5, y: 0.3 }}
-            style={StyleSheet.absoluteFill}
-          />
-        )}
-        <View style={styles.header}>
+      <View style={styles.overlay}>
+        <LinearGradient
+          colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0)']}
+          start={{ x: 0.5, y: 1 }}
+          end={{ x: 0.5, y: 0.3 }}
+          style={StyleSheet.absoluteFill}
+        />
+        
+
+        <View style={styles.bottomContent}>
+          <ScrollView
+            style={[styles.content, { flexGrow: 0 }]}
+            contentContainerStyle={{ paddingBottom: 8 }}
+            showsVerticalScrollIndicator={true}
+            nestedScrollEnabled={true}
+          >
+
+<View style={styles.header}>
           <TouchableOpacity
             style={styles.userInfoContainer}
             onPress={(e) => { e.stopPropagation && e.stopPropagation(); handleUserPress(); }}
@@ -196,137 +174,63 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
           </View>
         </View>
 
-        <View style={styles.bottomContent}>
-          {expanded ? (
-            <>
-              <ScrollView
-                style={[styles.content, { flexGrow: 0 }]}
-                contentContainerStyle={{ paddingBottom: 8 }}
-                showsVerticalScrollIndicator={true}
-                nestedScrollEnabled={true}
-              >
-                <View style={styles.detailRow}>
-                  <View style={[styles.timeLeftPill, pillStyle]}>
-                    <Text style={styles.timeLeftText}>{timeLeftText}</Text>
-                  </View>
-                </View>
-                <Text style={styles.title}>{idea.title}</Text>
-                <TouchableOpacity
-                  style={styles.interestedContainer}
-                  onPress={(e) => { e.stopPropagation && e.stopPropagation(); handleInterestCounterPress(); }}
-                  disabled={!navigation}
-                >
-                  <View style={styles.interestedAvatarsRow}>
-                    {idea.interestedUsersPreview.slice(0, 3).map((user, idx) => (
-                      <Image
-                        key={user.id}
-                        source={{ uri: user.avatar }}
-                        style={[
-                          styles.interestedAvatar,
-                          idx > 0 && { marginLeft: -8 },
-                          idea.interestedUsers.length >= idea.minimumInterested && styles.interestedAvatarMet,
-                        ]}
-                      />
-                    ))}
-                  </View>
-                  <View style={{ flexDirection: 'row' }}>
-                    <Text
-                      style={[
-                        styles.interestedPillText,
-                        idea.interestedUsers.length >= idea.minimumInterested && styles.interestedPillTextMet
-                      ]}
-                    >
-                      {idea.interestedUsers.length} interested
-                    </Text>
-                    <Text 
-                      style={[
-                        styles.interestedPillText,
-                        idea.interestedUsers.length >= idea.minimumInterested && styles.interestedPillTextMet
-                      ]}
-                    >
-                      {' / '}
-                    </Text>
-                    <Text 
-                      style={[
-                        styles.interestedPillText,
-                        idea.interestedUsers.length >= idea.minimumInterested && styles.interestedPillTextMet
-                      ]}
-                    >
-                      {idea.minimumInterested} minimum
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-                <View style={styles.divider} />
-                <Text style={styles.description}>
-                  {idea.description}
-                </Text>
-                <TouchableOpacity onPress={toggleExpanded} style={styles.seeMoreButton}>
-                  <Text style={styles.seeMoreText}>See Less</Text>
-                </TouchableOpacity>
-              </ScrollView>
-            </>
-          ) : (
-            <View style={styles.content}>
-              <View style={styles.detailRow}>
-                <View style={[styles.timeLeftPill, pillStyle]}>
-                  <Text style={styles.timeLeftText}>{timeLeftText}</Text>
-                </View>
+            <View style={styles.detailRow}>
+              <View style={[styles.timeLeftPill, pillStyle]}>
+                <Text style={styles.timeLeftText}>{timeLeftText}</Text>
               </View>
-              <Text style={styles.title}>{idea.title}</Text>
-              <TouchableOpacity
-                style={styles.interestedContainer}
-                onPress={(e) => { e.stopPropagation && e.stopPropagation(); handleInterestCounterPress(); }}
-                disabled={!navigation}
-              >
-                <View style={styles.interestedAvatarsRow}>
-                  {idea.interestedUsersPreview.slice(0, 3).map((user, idx) => (
-                    <Image
-                      key={user.id}
-                      source={{ uri: user.avatar }}
-                      style={[
-                        styles.interestedAvatar,
-                        idx > 0 && { marginLeft: -8 },
-                        idea.interestedUsers.length >= idea.minimumInterested && styles.interestedAvatarMet,
-                      ]}
-                    />
-                  ))}
-                </View>
-                <View style={{ flexDirection: 'row' }}>
-                  <Text
-                    style={[
-                      styles.interestedPillText,
-                      idea.interestedUsers.length >= idea.minimumInterested && styles.interestedPillTextMet
-                    ]}
-                  >
-                    {idea.interestedUsers.length} interested
-                  </Text>
-                  <Text 
-                    style={[
-                      styles.interestedPillText,
-                      idea.interestedUsers.length >= idea.minimumInterested && styles.interestedPillTextMet
-                    ]}
-                  >
-                    {' / '}
-                  </Text>
-                  <Text 
-                    style={[
-                      styles.interestedPillText,
-                      idea.interestedUsers.length >= idea.minimumInterested && styles.interestedPillTextMet
-                    ]}
-                  >
-                    {idea.minimumInterested} minimum
-                  </Text>
-                </View>
-              </TouchableOpacity>
-              <View style={styles.divider} />
-              <Text style={styles.description} numberOfLines={2}>
-                {idea.description}
-              </Text>
-              <TouchableOpacity onPress={toggleExpanded} style={styles.seeMoreButton}>
-                <Text style={styles.seeMoreText}>See More</Text>
-              </TouchableOpacity>
             </View>
-          )}
+            <Text style={styles.title}>{idea.title}</Text>
+            <TouchableOpacity
+              style={styles.interestedContainer}
+              onPress={(e) => { e.stopPropagation && e.stopPropagation(); handleInterestCounterPress(); }}
+              disabled={!navigation}
+            >
+              <View style={styles.interestedAvatarsRow}>
+                {idea.interestedUsersPreview.slice(0, 3).map((user, idx) => (
+                  <Image
+                    key={user.id}
+                    source={{ uri: user.avatar }}
+                    style={[
+                      styles.interestedAvatar,
+                      idx > 0 && { marginLeft: -8 },
+                      idea.interestedUsers.length >= idea.minimumInterested && styles.interestedAvatarMet,
+                    ]}
+                  />
+                ))}
+              </View>
+              <View style={{ flexDirection: 'row' }}>
+                <Text
+                  style={[
+                    styles.interestedPillText,
+                    idea.interestedUsers.length >= idea.minimumInterested && styles.interestedPillTextMet
+                  ]}
+                >
+                  {idea.interestedUsers.length} interested
+                </Text>
+                <Text 
+                  style={[
+                    styles.interestedPillText,
+                    idea.interestedUsers.length >= idea.minimumInterested && styles.interestedPillTextMet
+                  ]}
+                >
+                  {' / '}
+                </Text>
+                <Text 
+                  style={[
+                    styles.interestedPillText,
+                    idea.interestedUsers.length >= idea.minimumInterested && styles.interestedPillTextMet
+                  ]}
+                >
+                  {idea.minimumInterested} minimum
+                </Text>
+              </View>
+            </TouchableOpacity>
+            <View style={styles.divider} />
+            <Text style={styles.description}>
+              {idea.description}
+            </Text>
+          </ScrollView>
+
           <View style={styles.actions}>
             {isCreator ? (
               <TouchableOpacity
@@ -575,6 +479,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.35)',
     padding: 16,
+    paddingTop: 0,
     flexDirection: 'column',
   },
   overlayExpanded: {
@@ -587,7 +492,8 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 180,
+    marginTop: 16,
   },
   userInfoContainer: {
     flexDirection: 'row',
@@ -619,7 +525,6 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     padding: 4,
   },
-
   content: {
     marginBottom: 12,
   },
@@ -641,19 +546,6 @@ const styles = StyleSheet.create({
   },
   descriptionScrollViewExpanded: {
     maxHeight: 200,
-  },
-  seeMoreButton: {
-    marginTop: 4,
-    alignSelf: 'center',
-  },
-  seeMoreText: {
-    color: '#ebebeb',
-    fontSize: 12,
-    fontWeight: '800',
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-    paddingVertical: 4,
   },
   divider: {
     height: 1,
